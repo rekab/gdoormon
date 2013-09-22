@@ -1,0 +1,38 @@
+---
+CODE LAYOUT:
+---
+
+  doorcontrol/
+    - modules for controlling the door
+  doorsensor/
+    - modules for detecting if the door is open
+  presence/
+    - modules for detecting if someone is home
+  services/
+    - twisted modules for services
+  state/
+    - state machine logic
+  xmpp/
+    - xmpp communication
+
+
+---
+PREREQS:
+---
+  sudo apt-get install wokkel        # also installs twisted
+  sudo apt-get install python-mox    # for tests
+  https://github.com/oxplot/fysom/blob/master/fysom.py
+  sudo apt-get install tesseract     
+  sudo apt-get install python-imaging
+
+
+---
+TODO:
+---
+  - reformat this file using markdown
+  - replace consolelog with twisted log
+  - Announce when registered clients connect/disconnect
+  - Perform an action when number of connected registered clients goes to zero or nonzero
+  - image screensaver
+    - turn screen on during motion
+  - find a better way to manage deps; relying on apt for libs is suboptimal
