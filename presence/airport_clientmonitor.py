@@ -7,10 +7,8 @@ import airport_snmp
 import argparse
 import consolelog
 import logging
-import leasemonitor
 import os
 import shelve
-import ssh
 import sys
 import time
 

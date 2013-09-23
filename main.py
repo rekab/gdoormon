@@ -10,8 +10,8 @@ from twisted.web import server
 application = service.Application("gdoormon")
 sc = service.IServiceCollection(application)
 
-site = server.Site(registration.Registration())
-i = internet.TCPServer(8080, site)
+factory = server.Site(registration.GetRegistrationResource())
+i = internet.TCPServer(8080, factory)
 i.setServiceParent(sc)
 
 #ts = TimerService(15, presence_process.)

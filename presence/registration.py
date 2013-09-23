@@ -1,5 +1,9 @@
+import cgi
 import logging
 import re
+import shelve
+
+from presence import airport_clientmonitor
 
 from twisted.internet import defer
 from twisted.internet import error
@@ -8,7 +12,6 @@ from twisted.internet import reactor
 from twisted.python import log
 from twisted.web import resource
 from twisted.web import server
-from twisted.web import error as web_error
 from twisted.python import failure
 
 ARP_BIN = '/usr/sbin/arp'
@@ -37,6 +40,8 @@ class GetMacForIpProcessProtocol(protocol.ProcessProtocol):
     self._data.append(data)
 
   def processEnded(self, status):
+    """Determine if the process succeded or failed. On success, calls the
+    deferred callback with a lowercased string of the mac address obtained."""
     if isinstance(status.value, error.ProcessTerminated):
       msg = 'Process exited with non-zero status code: %d' % status.value.exitCode
       log.error(msg, logLevel=logging.CRITICAL)
@@ -46,7 +51,7 @@ class GetMacForIpProcessProtocol(protocol.ProcessProtocol):
     # Parse the output
     lines = ''.join(self._data).split('\n')
     if len(lines) != 3:
-      msg = 'cmd returned: %s' % lines
+      msg = 'Cannot parse arp response: <pre>%s</pre>' % '\n'.join(lines)
       log.msg(msg, logLevel=logging.CRITICAL)
       self._d.errback(CannotGetIp(msg))
       return
@@ -57,34 +62,64 @@ class GetMacForIpProcessProtocol(protocol.ProcessProtocol):
       log.msg(msg, logLevel=logging.CRITICAL)
       self._d.errback(CannotGetIp(msg))
       return
-    self._d.callback(parts[2])
+    self._d.callback(parts[2].lower())
 
 
-class Registration(resource.Resource):
-  isLeaf = True
+class RegistrationResource(resource.Resource):
+  """Base class for registration web resources."""
 
-  def handleError(self, failure, request):
+  def handleLookupError(self, failure, request):
     request.write('failed to lookup your mac: %s' % failure)
 
+  def handleLookup(self, mac, request):
+    raise NotImplemented('uhh')
+
+  def render_POST(self, request):
+    return self.render_GET(request)
+
   def render_GET(self, request):
-    if request.path.endswith('favicon.ico'):
-      return web_error.NoResource()
+    """Takes a request, spawns an arp lookup subprocess."""
+    if not request.path.endswith('/'):
+      request.setResponseCode(404)
+      return 'That resource is not here.'
 
     d = defer.Deferred()
-    d.addCallbacks(self.handleLookup, self.handleError, callbackArgs=(request,),
-        errbackArgs=(request,))
+    d.addCallbacks(self.handleLookup, self.handleLookupError,
+        callbackArgs=(request,), errbackArgs=(request,))
     d.addBoth(self.done, request)
     lookupProcess = GetMacForIpProcessProtocol(request.getClientIP(), d)
     reactor.spawnProcess(lookupProcess, lookupProcess.getExecutable(),
         lookupProcess.getArgs())
     return server.NOT_DONE_YET
 
+  def done(self, reason, request):
+    if isinstance(reason, failure.Failure):
+      log.err()
+      request.write('Internal error.')
+    request.finish()
+
+
+class RegistrationLookup(RegistrationResource):
+  isLeaf = True
+
+  def __init__(self, form_action):
+    RegistrationResource.__init__(self)
+    self._form_action = form_action
+
   def handleLookup(self, mac, request):
-    request.write('FYI your MAC address is: %s' % mac)
+    """Displays the form to register or unregister a mac address.
+
+    Called when the arp lookup subprocess completes.
+
+    Args:
+      mac: mac address as string
+      request: request object
+    """
+    request.write('Your MAC address is: %s<p>' % mac)
     db = None
     try:
-      db = shelve.open(clientmonitor.CLIENT_DB_PATH)
-      request.write('<form action="/register" method="post">')
+      db = shelve.open(airport_clientmonitor.CLIENT_DB_PATH)
+      request.write('<form action="%s" method="post">' % self._form_action)
       if mac in db:
         request.write('You are registered.')
         request.write('<input type="hidden" name="action" value="unregister">')
@@ -98,6 +133,46 @@ class Registration(resource.Resource):
       if db is not None:
         db.close()
 
-  def done(self, reason, request):
-    request.finish()
 
+class RegistrationUpdate(RegistrationResource):
+  isLeaf = True
+
+  def handleLookup(self, mac, request):
+    #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+    #if ctype == 'multipart/form-data':
+    #  postvars = cgi.parse_multipart(self.rfile, pdict)
+    #elif ctype == 'application/x-www-form-urlencoded':
+    #  length = int(self.headers.getheader('content-length'))
+    #  postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+    #else:
+    #  self.wfile.write('no data posted')
+    #  return
+    postvars = request.args
+    if ('action' not in postvars or 
+        postvars['action'][0] not in ['register', 'unregister']):
+      request.setResponseCode(500)
+      request.write('missing args')
+      return
+    # TODO: refactor db manipulations to a module
+    db = None
+    try:
+      db = shelve.open(airport_clientmonitor.CLIENT_DB_PATH)
+      request.write('Your divice (%s) is ' % mac)
+      if postvars['action'][0] == 'register':
+        db[mac] = request.getClientIP()
+      else:
+        if mac in db:
+          del db[mac]
+        request.write('un')
+      request.write('registered.')
+    finally:
+      if db is not None:
+        db.close()
+
+
+def GetRegistrationResource():
+  root = resource.Resource()
+  lookup = RegistrationLookup('/register/')
+  root.putChild('', lookup)
+  root.putChild('register', RegistrationUpdate())
+  return root
