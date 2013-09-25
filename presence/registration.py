@@ -21,7 +21,10 @@ class CannotGetIp(failure.Failure):
 
 
 class GetMacForIpProcessProtocol(protocol.ProcessProtocol):
-  """Calls arp -n <p> address to get the mac address of a connected ip."""
+  """Calls arp -n <p> address to get the mac address of a connected ip.
+  
+  In retrospect, writing this as an asynchronous process is overkill.
+  """
   def __init__(self, ip, d):
     self._ip = ip
     self._d = d
@@ -69,9 +72,11 @@ class RegistrationResource(resource.Resource):
   """Base class for registration web resources."""
 
   def handleLookupError(self, failure, request):
+    """Called when the mac address looked fails."""
     request.write('failed to lookup your mac: %s' % failure)
 
   def handleLookup(self, mac, request):
+    """Called when the mac address looked completes."""
     raise NotImplemented('uhh')
 
   def render_POST(self, request):
@@ -109,7 +114,7 @@ class RegistrationLookup(RegistrationResource):
   def handleLookup(self, mac, request):
     """Displays the form to register or unregister a mac address.
 
-    Called when the arp lookup subprocess completes.
+    Called when the mac address lookup subprocess completes.
 
     Args:
       mac: mac address as string
@@ -138,22 +143,17 @@ class RegistrationUpdate(RegistrationResource):
   isLeaf = True
 
   def handleLookup(self, mac, request):
-    #ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-    #if ctype == 'multipart/form-data':
-    #  postvars = cgi.parse_multipart(self.rfile, pdict)
-    #elif ctype == 'application/x-www-form-urlencoded':
-    #  length = int(self.headers.getheader('content-length'))
-    #  postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
-    #else:
-    #  self.wfile.write('no data posted')
-    #  return
+    """Register or unregister a mac address.
+
+    Called when the mac address lookup subprocess completes.
+    """
     postvars = request.args
     if ('action' not in postvars or 
         postvars['action'][0] not in ['register', 'unregister']):
       request.setResponseCode(500)
       request.write('missing args')
       return
-    # TODO: refactor db manipulations to a module
+    # TODO: refactor db manipulations to a module. Use twisted's DirDBM.
     db = None
     try:
       db = shelve.open(airport_clientmonitor.CLIENT_DB_PATH)
