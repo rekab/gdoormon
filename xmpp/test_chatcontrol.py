@@ -1,3 +1,5 @@
+#!/usr/bin/trial
+
 from twisted.trial import unittest
 from twisted.words.xish import domish
 from xmpp import chatcontrol
@@ -12,6 +14,7 @@ class FakeStatemach(object):
     return command in self.valid_commands
 
   def __getattr__(self, attr):
+    """Return a lambda that records the call to the statemach."""
     return lambda sender, args: self.recordCall(attr, sender, args)
 
   def recordCall(self, attr, sender, args):
@@ -54,7 +57,7 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     msg = domish.Element((None, 'message'))
     msg['from'] = sender
     msg['type'] = 'chat'
-    msg.body = text
+    msg.addElement('body', content=text)
     self.receiver.onMessage(msg)
 
   def testHelp(self):

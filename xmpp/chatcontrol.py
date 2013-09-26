@@ -41,7 +41,7 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
   def onMessage(self, msg):
     if not (msg["type"] == 'chat' and hasattr(msg, "body") and msg.body):
       return
-    command_match = self.command_re.match(msg.body)
+    command_match = self.command_re.match(str(msg.body))
     if command_match:
       result = self.dispatchCommand(
           msg["from"], command_match.group(1),
