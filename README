@@ -31,7 +31,10 @@ PREREQS:
 TODO:
 ---
   - better dep management (no apt)
+    - fysom as git submodule
     - pip install virtualenv virtualenvwrapper
+    - mkvirtualenv gdoormon
+    - workon gdoormon
     - pip install -r requirements.txt
   - reformat this file using markdown
   - replace consolelog with twisted log
