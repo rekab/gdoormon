@@ -47,7 +47,7 @@ class GetMacForIpProcessProtocol(protocol.ProcessProtocol):
     deferred callback with a lowercased string of the mac address obtained."""
     if isinstance(status.value, error.ProcessTerminated):
       msg = 'Process exited with non-zero status code: %d' % status.value.exitCode
-      log.error(msg, logLevel=logging.CRITICAL)
+      log.msg(msg, logLevel=logging.CRITICAL)
       self._d.errback(CannotGetIp(msg))
       return
 
