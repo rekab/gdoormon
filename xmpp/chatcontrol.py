@@ -76,7 +76,7 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       duration = int(cmd_args[0])
     except ValueError, e:
       return 'cannot parse "%s"' % cmd_args[0]
-    self.statemach.snoozeAlert(int(cmd_args))
+    return self.statemach.snoozeTimeout(int(cmd_args))
 
   def command_help(self, sender, cmd_args):
     return "help yourself"
