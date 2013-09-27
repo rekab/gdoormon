@@ -7,8 +7,8 @@ import serial
 from twisted.internet import reactor
 from twisted.python import log
 
-IMPINGE_ANGLE = 170
-RETRACT_ANGLE = 10
+IMPINGE_ANGLE = 10
+RETRACT_ANGLE = 170
 
 
 class PololuMicroMaestro(object):
