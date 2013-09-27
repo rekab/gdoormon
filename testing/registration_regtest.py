@@ -5,7 +5,8 @@ from twisted.application import service
 from twisted.web import server
 
 application = service.Application("registration_regtest")
-sc = service.IServiceCollection(application)  # is this a cast?
+sc = service.MultiService()
+sc.setServiceParent(application)
 #clients = clientdb.GetClientDb() # TODO
 factory = server.Site(registration.GetRegistrationResource())
 i = internet.TCPServer(8080, factory)
