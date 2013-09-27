@@ -2,7 +2,7 @@
 
 from twisted.trial import unittest
 from twisted.words.xish import domish
-from xmpp import chatcontrol
+from chatcontrol import xmpp
 
 
 class FakeStatemach(object):
@@ -34,7 +34,7 @@ class TestChatProtocolBase(unittest.TestCase):
 class TestBroadcastProtocol(TestChatProtocolBase):
   def setUp(self):
     TestChatProtocolBase.setUp(self)
-    self.broadcast = chatcontrol.ChatBroadcastProtocol(self.subscribers)
+    self.broadcast = xmpp.ChatBroadcastProtocol(self.subscribers)
     self.patch(self.broadcast, 'send', self.mockSend)
 
   def testSendAllSubscribers(self):
@@ -49,7 +49,7 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
   def setUp(self):
     TestChatProtocolBase.setUp(self)
     self.statemach = FakeStatemach(set(['command_test_command']))
-    self.receiver = chatcontrol.ChatCommandReceiverProtocol(
+    self.receiver = xmpp.ChatCommandReceiverProtocol(
         self.statemach, self.subscribers)
     self.patch(self.receiver, 'send', self.mockSend)
 
