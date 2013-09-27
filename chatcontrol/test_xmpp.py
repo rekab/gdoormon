@@ -2,7 +2,7 @@
 
 from twisted.trial import unittest
 from twisted.words.xish import domish
-from chatcontrol import xmpp
+import xmpp
 
 
 class FakeStatemach(object):
