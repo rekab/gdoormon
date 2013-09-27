@@ -38,7 +38,12 @@ TODO:
     - pip install -r requirements.txt
   - reformat this file using markdown
   - replace consolelog with twisted log
-  - subscribe to when registered clients connect/disconnect
-  - Perform an action when number of connected registered clients goes to zero or nonzero
+  - setup a config file with xmpp login details
+  - subscribe to:
+    - when registered clients connect/disconnect
+    - when nobody/somebody is home
+    - when the door changes state
+  - support dd-wrt/airport interchangeably 
+  - support irc
   - image screensaver
     - turn screen on during motion
