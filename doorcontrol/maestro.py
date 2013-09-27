@@ -2,10 +2,10 @@
 
 Requires the pololu micro maestro, set in "USB Dual Port" mode.
 """
-import consolelog
 import logging
 import serial
-import time
+from twisted.internet import reactor
+from twisted.python import log
 
 IMPINGE_ANGLE = 170
 RETRACT_ANGLE = 10
@@ -16,11 +16,11 @@ class PololuMicroMaestro(object):
   def __init__(self, port='/dev/ttyACM0'):
       self.ser = serial.Serial(port=port)
 
-  def SetAngle(self, angle, channel=0):
+  def setAngle(self, angle, channel=0):
     """Set the target angle of the servo.  This is converted into "quarter
     microseconds", i.e., the pulse width necessary to get to that angle (and
     thus it's between 1.0ms and 2.0ms in increments of 0.25us).  Whew!"""
-    logging.log(logging.INFO, 'SetAngle(%s)', angle)
+    log.msg('SetAngle(%s)' % angle)
     minAngle = 0.0
     maxAngle = 180.0
     # these numbers, in quarter microseconds, taken from the code here:
@@ -36,40 +36,46 @@ class PololuMicroMaestro(object):
     self.ser.write(command)
     self.ser.flush()
 
-  def GoHome(self):
+  def goHome(self):
     """Set all servos to home position."""
-    logging.log(logging.INFO, 'GoHome()')
+    log.msg('GoHome()')
     self.ser.write(chr(0xA2))
 
-  def Close(self):
+  def close(self):
     self.ser.close()
+
+  def __del__(self):
+    self.close()
 
 
 class DoorControl(object):
-  def __init__(self, p):
+  def __init__(self, p, pressDuration=.5, callLater=reactor.callLater):
     self._p = p
-    self._Retract()
+    self._pressDuration = pressDuration
+    self._callLater = callLater
 
-  def _Retract(self):
-    logging.log(logging.INFO, '<- retract')
-    self._p.SetAngle(IMPINGE_ANGLE)
-    time.sleep(.5)
-    self._p.GoHome()
+  def _impinge(self):
+    log.msg('impinge ->')
+    self._p.setAngle(IMPINGE_ANGLE)
 
-  def _Impinge(self):
-    logging.log(logging.INFO, 'impinge ->')
-    self._p.SetAngle(RETRACT_ANGLE)
+  def _retract(self):
+    log.msg('<- retract')
+    self._p.setAngle(RETRACT_ANGLE)
+    self._callLater(self._pressDuration, self._idle)
+  
+  def _idle(self):
+    log.msg('idle')
+    self._p.goHome()
 
-  def HitButton(self):
-    self._Impinge()
-    time.sleep(.5)
-    self._Retract()
+  def hitButton(self):
+    self._impinge()
+    self._callLater(self._pressDuration, self._retract)
 
 
-if __name__ == '__main__':
-  consolelog.SetupRootLogger()
-  p = PololuMicroMaestro()
-  dc = DoorControl(p)
-  while True:
-    dc.HitButton()
-    time.sleep(1)
+#if __name__ == '__main__':
+#  import time
+#  p = PololuMicroMaestro()
+#  dc = DoorControl(p)
+#  while True:
+#    dc.HitButton()
+#    time.sleep(1)
