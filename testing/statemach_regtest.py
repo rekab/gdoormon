@@ -7,10 +7,10 @@ from twisted.application import service
 from twisted.python import log
 from doorcontrol import maestro
 from state import statemach
-import fake_chatcontrol
-import fake_doorcontrol
-import fake_doorsensor
-import fake_presence
+from testing import fake_chatcontrol
+from testing import fake_doorcontrol
+from testing import fake_doorsensor
+from testing import fake_presence
 
 application = service.Application("statemach_regtest")
 
@@ -22,14 +22,14 @@ def fakeOsSystem(command):
 
 # All times should be relative primes.
 statemach = statemach.StateMachine(fake_broadcaster, door_controller,
-    doorOpenTimeoutSecs=2, alertTimeoutSecs=1, system=fakeOsSystem)
+    doorOpenTimeoutSecs=2.1, alertTimeoutSecs=1.3, system=fakeOsSystem)
 
 fake_presence_service = internet.TimerService(
-    3, fake_presence.randomPresence, statemach)
+    3.55, fake_presence.randomPresence, statemach)
 fake_presence_service.setServiceParent(application)
 
 fake_doorsensor_service = internet.TimerService(
-    5, fake_doorsensor.randomDoorState, statemach)
+    5.7, fake_doorsensor.randomDoorState, statemach)
 fake_doorsensor_service.setServiceParent(application)
 
 commander = fake_chatcontrol.FakeChatCommandReceiverProtocol(statemach)
