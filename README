@@ -39,6 +39,8 @@ TODO:
   - reformat this file using markdown
   - replace consolelog with twisted log
   - setup a config file with xmpp login details
+  - snooze timeout warning
+  - pylint script
   - subscribe to:
     - when registered clients connect/disconnect
     - when nobody/somebody is home
