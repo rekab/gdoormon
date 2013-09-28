@@ -59,7 +59,9 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       return getattr(self, event_name)(sender, cmd_args)
     if self.statemach.can(event_name):
       log.msg('Calling %s on statemach' % event_name)
-      return getattr(self.statemach, event_name)(sender, cmd_args)
+      #return getattr(self.statemach, event_name)(sender, cmd_args)
+      # statemach calls don't take args
+      return getattr(self.statemach, event_name)(sender)
     log.msg('Bad command %s' % event_name)
     return 'bad command'
 
@@ -86,8 +88,8 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       duration = int(cmd_args[0])
     except ValueError, e:
       return 'cannot parse "%s"' % cmd_args[0]
-    log.msg('calling statemach.snoozeTimeout(%d)' % int(cmd_args))
-    return self.statemach.snoozeTimeout(int(cmd_args))
+    log.msg('calling statemach.snoozeAlert(%d)' % int(cmd_args))
+    return self.statemach.snoozeAlert(int(cmd_args))
 
   def command_help(self, sender, cmd_args):
     return "help yourself"

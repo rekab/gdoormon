@@ -148,3 +148,4 @@ class StateMachineTest(unittest.TestCase):
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS)
     self.m.VerifyAll()
 
+  # todo someone_home repeatedly?

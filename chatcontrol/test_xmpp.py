@@ -115,3 +115,6 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     self.assertEquals(0, len(self.statemach.called))
     self.assertEquals('bad command', str(self.sent.pop().body))
     self.assertEquals(0, len(self.sent))
+
+  def testSnooze(self):
+    pass # TODO

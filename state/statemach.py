@@ -22,13 +22,14 @@ class StateMachine():
   def __init__(self, broadcaster, doorControl,
       doorOpenTimeoutSecs=DOOR_OPEN_TIMEOUT_SECS,
       alertTimeoutSecs=ALERT_TIMEOUT_SECS,
-      callLater=reactor.callLater): 
+      callLater=reactor.callLater, system=os.system): 
     self.broadcaster = broadcaster
     self.doorControl = doorControl
     self.doorOpenTimeoutSecs = doorOpenTimeoutSecs
     self.alertTimeoutSecs = alertTimeoutSecs
     self.pendingTimeout = None
     self._callLater = callLater
+    self._system = system
     self.state = fysom.Fysom({
         'initial': 'ok',
         'events': [
@@ -78,7 +79,7 @@ class StateMachine():
 
   def logAndSpeakMessage(self, message):
     log.msg(message, logLevel=logging.INFO)
-    os.system('espeak "%s" &' % message)
+    self._system('espeak "%s" &' % message)
 
   def logStateChange(self, e):
     log.msg(
@@ -125,6 +126,7 @@ class StateMachine():
     self.logAndSpeakMessage(message)
     self.broadcaster.sendAllSubscribers(message)
     self.doorControl.hitButton()
+    return 'close door command issued'
     # TODO: setup a timeout until door_stuck
 
   def snoozeAlert(self, duration):
