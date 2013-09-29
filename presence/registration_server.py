@@ -5,9 +5,9 @@ import clientmonitor
 import leasemonitor
 import logging
 import re
-import shelve
 import subprocess
 import BaseHTTPServer
+from presence import clientdb
 
 SERVER_PORT = 2020
 ARP = '/usr/sbin/arp'
@@ -60,8 +60,7 @@ class RegistrationHandler(BaseHTTPServer.BaseHTTPRequestHandler):
       self.wfile.write('ctype=%s length=%s' % (ctype, length))
       self.wfile.write('what? %s' % postvars)
       return
-    # TODO: refactor db manipulations to a module
-    db = shelve.open(clientmonitor.CLIENT_DB_PATH)
+    db = clientdb.getDb()
     try:
       ip = self.client_address[0]
       mac = GetMacForIp(ip)
@@ -84,7 +83,7 @@ class RegistrationHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     try:
       mac = GetMacForIp(self.client_address[0])
       self.wfile.write('FYI your MAC address is: %s' % mac)
-      db = shelve.open(clientmonitor.CLIENT_DB_PATH)
+      db = clientdb.getDb()
       self.wfile.write('<form action="/register" method="post">')
       if mac in db:
         self.wfile.write('You are registered.')

@@ -3,7 +3,7 @@ import argparse
 import clientmonitor
 import logging
 import pprint
-import shelve
+from presence import clientdb
 
 def List(d, key):
   if key:
@@ -30,12 +30,13 @@ if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Manipulate a client db')
   parser.add_argument('--command', help='list, add, or del', required=True)
   parser.add_argument('--key', help='key to list, add, or del')
-  parser.add_argument('--db', help='db path', default=clientmonitor.CLIENT_DB_PATH)
+  # TODO: this flag should come from clientdb
+  parser.add_argument('--db', help='db path', default=clientdb.DEFAULT_DB_PATH)
   flags = parser.parse_args()
 
   if flags.command not in COMMANDS:
     logging.log(logging.FATAL, 'unknown command: %s', flags.command)
 
-  d = shelve.open(flags.db)
+  d = clientdb.getDb(flags.db)
   COMMANDS[flags.command](d, flags.key)
 

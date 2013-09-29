@@ -21,18 +21,18 @@ def fakeOsSystem(command):
   log.msg('os.system("%s")' % command)
 
 # All times should be relative primes.
-statemach = statemach.StateMachine(fake_broadcaster, door_controller,
+sm = statemach.StateMachine(fake_broadcaster, door_controller,
     doorOpenTimeoutSecs=2.1, alertTimeoutSecs=1.3, system=fakeOsSystem)
 
 fake_presence_service = internet.TimerService(
-    3.55, fake_presence.randomPresence, statemach)
+    3.55, fake_presence.randomPresence, sm)
 fake_presence_service.setServiceParent(application)
 
 fake_doorsensor_service = internet.TimerService(
-    5.7, fake_doorsensor.randomDoorState, statemach)
+    5.7, fake_doorsensor.randomDoorState, sm)
 fake_doorsensor_service.setServiceParent(application)
 
-commander = fake_chatcontrol.FakeChatCommandReceiverProtocol(statemach)
+commander = fake_chatcontrol.FakeChatCommandReceiverProtocol(sm)
 fake_xmpp_service = internet.TimerService(
     7, commander.pretendSomethingHappened)
 fake_xmpp_service.setServiceParent(application)

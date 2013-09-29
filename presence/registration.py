@@ -1,9 +1,9 @@
 import cgi
 import logging
 import re
-import shelve
 
 from presence import airport_clientmonitor
+from presence import clientdb
 
 from twisted.internet import defer
 from twisted.internet import error
@@ -123,7 +123,7 @@ class RegistrationLookup(RegistrationResource):
     request.write('Your MAC address is: %s<p>' % mac)
     db = None
     try:
-      db = shelve.open(airport_clientmonitor.CLIENT_DB_PATH)
+      db = clientdb.getDb()
       request.write('<form action="%s" method="post">' % self._form_action)
       if mac in db:
         request.write('You are registered.')
@@ -153,21 +153,15 @@ class RegistrationUpdate(RegistrationResource):
       request.setResponseCode(500)
       request.write('missing args')
       return
-    # TODO: refactor db manipulations to a module. Use twisted's DirDBM.
-    db = None
-    try:
-      db = shelve.open(airport_clientmonitor.CLIENT_DB_PATH)
-      request.write('Your divice (%s) is ' % mac)
-      if postvars['action'][0] == 'register':
-        db[mac] = request.getClientIP()
-      else:
-        if mac in db:
-          del db[mac]
-        request.write('un')
-      request.write('registered.')
-    finally:
-      if db is not None:
-        db.close()
+    db = clientdb.getDb()
+    request.write('Your device (%s) is ' % mac)
+    if postvars['action'][0] == 'register':
+      db[mac] = request.getClientIP()
+    else:
+      if mac in db:
+        del db[mac]
+      request.write('un')
+    request.write('registered.')
 
 
 def GetRegistrationResource():

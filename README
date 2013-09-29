@@ -41,6 +41,8 @@ TODO:
   - setup a config file with xmpp login details
   - snooze timeout warning
   - pylint script
+  - broadcast who comes home and last person who left; register name when
+    registering. default to "user1", "user2", etc.
   - subscribe to:
     - when registered clients connect/disconnect
     - when nobody/somebody is home

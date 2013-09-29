@@ -7,7 +7,7 @@ import netsnmp
 import logging
 
 
-def GetNumClients(host):
+def getNumClients(host):
   """Get the number of wireless clients connected to an Airport.
 
   Args:
@@ -26,7 +26,7 @@ def GetNumClients(host):
   return retval
 
 
-def TableToDict(table, num):
+def tableToDict(table, num):
   """Get a dictionary of SNMP data.
   
   The netsnmp library returns a tuple with all of the data, it is not in any
@@ -78,7 +78,7 @@ def TableToDict(table, num):
   return clientTable
 
 
-def GetData(host):
+def getData(host):
   """Returns a dictionary populated with data about all wireless clients.
 
   Args:
@@ -88,7 +88,7 @@ def GetData(host):
   """
   wirelessClientTableOID = '.1.3.6.1.4.1.63.501.3.2.2.1'
 
-  numClients = GetNumClients(host)
+  numClients = getNumClients(host)
 
   if numClients == 0:
     return {}
@@ -97,12 +97,12 @@ def GetData(host):
   clientTable = netsnmp.snmpwalk(netsnmp.Varbind(wirelessClientTableOID), 
                                  Version=2, DestHost=host, 
                                  Community='public')
-  clients = TableToDict(clientTable, numClients)
+  clients = tableToDict(clientTable, numClients)
 
   return clients
 
 
 if __name__ == '__main__':
-  clients = GetData('hoth')
+  clients = getData('hoth')
   for client, client_data in clients.iteritems():
     print "%s => %s" % (client, client_data)
