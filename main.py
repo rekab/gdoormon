@@ -41,10 +41,10 @@ commander.setHandlerParent(xmppclient)
 xmppclient.setServiceParent(sc)
 
 # TODO: config
-airportHostname = "hoth"
+airport_hostname = "hoth"
 toggle = airport_clientmonitor.StatemachToggle(statemach)
-monitor = airport_clientmonitor.PresenceMonitor(clients, toggle)
+monitor = airport_clientmonitor.PresenceMonitor(airport_hostname, clients, toggle)
 pressence_service = internet.TimerService(15, monitor.check)
 presence_service.setServiceParent(sc)
-#door_sensor = internet.TimerService(15, door_sensor.DoorSensor, statemach)
-#door_sensor.setServiceParent(sc)
+#ds = internet.TimerService(15, doorsensor.DoorSensor, statemach)
+#ds.setServiceParent(sc)

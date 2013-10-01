@@ -23,7 +23,9 @@ sm = statemach.StateMachine(fake_broadcaster, door_controller,
 
 toggle = airport_clientmonitor.StatemachToggle(sm)
 clients = clientdb.getDb()
-monitor = airport_clientmonitor.PresenceMonitor("hoth", clients, toggle)
+# TODO: config
+airport_hostname = "hoth"
+monitor = airport_clientmonitor.PresenceMonitor(airport_hostname, clients, toggle)
 
 presence_service = internet.TimerService(15, monitor.check)
 presence_service.setServiceParent(application)
