@@ -23,7 +23,7 @@ class StateMachineTest(unittest.TestCase):
     self.mockBroadcaster = self.m.CreateMockAnything()
     self.mockDoorControl = self.m.CreateMock(maestro.DoorControl)
     self.statemach = statemach.StateMachine(self.mockBroadcaster, self.mockDoorControl,
-        callLater=self.clock.callLater)
+        callLater=self.clock.callLater, system=os.system)
 
   def testStartState(self):
     self.assertEquals('ok', self.statemach.getState())

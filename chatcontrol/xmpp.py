@@ -61,7 +61,7 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       log.msg('Calling %s on statemach' % event_name)
       #return getattr(self.statemach, event_name)(sender, cmd_args)
       # statemach calls don't take args
-      return getattr(self.statemach, event_name)(sender)
+      return getattr(self.statemach, event_name)(sender=sender, args=cmd_args)
     log.msg('Bad command %s' % event_name)
     return 'bad command'
 

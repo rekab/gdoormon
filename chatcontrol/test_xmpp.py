@@ -15,9 +15,9 @@ class FakeStatemach(object):
 
   def __getattr__(self, attr):
     """Return a lambda that records the call to the statemach."""
-    return lambda sender, args: self.recordCall(attr, sender, args)
+    return lambda sender, args: self.recordCall(attr, sender=sender, args=args)
 
-  def recordCall(self, attr, sender, args):
+  def recordCall(self, attr, sender=None, args=None):
     self.called.append((attr, sender, args))
     return 'ok'
 
