@@ -1,0 +1,4 @@
+wokkel==0.7.0
+#fysom==1.0.8
+mox==0.5.3
+opencv==2.3.1
