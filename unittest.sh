@@ -1,3 +1,9 @@
+#!/bin/bash
+# Run all unittests.
+#
+# Add this to .git/hooks/pre-commit:
+#   $(git rev-parse --show-toplevel)/unittest.sh
+
 cd $(dirname $0)
 status=0
 for test in */test_*.py ; do 
