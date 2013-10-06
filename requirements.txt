@@ -1,4 +1,4 @@
-wokkel==0.7.0
-#fysom==1.0.8
-mox==0.5.3
-opencv==2.3.1
+wokkel==0.7.0   # xmpp chat lib
+mox==0.5.3      # for tests
+#fysom==1.0.8   # todo: pip version uses different function names
+#opencv==2.3.1  # comes from apt-get instead

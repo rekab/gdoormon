@@ -22,16 +22,18 @@ PREREQS:
 
   sudo apt-get install python-opencv
   sudo apt-get install python-virtualenv
+  cd gdoormon
+  #wget https://github.com/oxplot/fysom/blob/master/fysom.py
   virtualenv --system-site-packages deps
   source deps/bin/activate
   pip install -r requirements.txt
-  https://github.com/oxplot/fysom/blob/master/fysom.py
 
 
 
-# not needed maybe:
+# now comes from pip/requirements.txt:
   sudo apt-get install wokkel        # also installs twisted
   sudo apt-get install python-mox    # for tests
+# not needed maybe:
   sudo apt-get install tesseract     
   sudo apt-get install python-imaging
 
