@@ -1,5 +1,8 @@
 /* HC-SR04 distance sensor and server.
  *
+ * Starts a webserver on port 80 that replies to any request with a string
+ * representation of the number of centimeters the rangefinder is detecting.
+ *
  * Pin configuration:
  *  HC-SR04:
  *    VCC  => Arduino 5v
@@ -13,7 +16,7 @@
  *    Client connected positive => Arduino pin 3 + ~300 ohm resistor
  *    All negative              => Arduino GND
  *
- * Distance calculation from: http://goo.gl/kJ8Gl
+ * Distance calculation from http://goo.gl/kJ8Gl
  */
 
 #include <SPI.h>
@@ -24,7 +27,7 @@
 #define TRIGGER_PIN 5
 #define MAX_RANGE_LED_PIN 8
 #define IN_RANGE_LED_PIN 9
-#define DATA_RECEIVED_PIN 3
+#define DATA_RECEIVED_LED_PIN 3
 
 // 1/(speed of sound), where (speed of sound) = 333.1 * .6 * (air temp in C)
 #define PACE_OF_SOUND 29.1  // microseconds per centimeter
@@ -112,14 +115,14 @@ void maybeAnswerHTTPRequest(long distance) {
   EthernetClient client = SERVER.available();
   if (client) {
     Serial.println("Client connected");
-    digitalWrite(DATA_RECEIVED_PIN, HIGH);
+    digitalWrite(DATA_RECEIVED_LED_PIN, HIGH);
     if (readClient(client)) {
       Serial.println("Request received");
       serveClient(client, distance);
     }
     Serial.println("closing connection");
     client.stop();
-    digitalWrite(DATA_RECEIVED_PIN, LOW);
+    digitalWrite(DATA_RECEIVED_LED_PIN, LOW);
   }
 }
 

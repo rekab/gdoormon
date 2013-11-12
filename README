@@ -20,7 +20,7 @@ CODE LAYOUT:
 PREREQS:
 ---
 
-  sudo apt-get install python-opencv
+  #sudo apt-get install python-opencv
   sudo apt-get install python-virtualenv
   cd gdoormon
   #wget https://github.com/oxplot/fysom/blob/master/fysom.py
@@ -30,12 +30,12 @@ PREREQS:
 
 
 
-# now comes from pip/requirements.txt:
-  sudo apt-get install wokkel        # also installs twisted
-  sudo apt-get install python-mox    # for tests
-# not needed maybe:
-  sudo apt-get install tesseract     
-  sudo apt-get install python-imaging
+  # now comes from pip/requirements.txt:
+  #sudo apt-get install wokkel        # also installs twisted
+  #sudo apt-get install python-mox    # for tests
+  # not needed maybe:
+  #sudo apt-get install tesseract     
+  #sudo apt-get install python-imaging
 
 
 

@@ -1,6 +1,10 @@
 #!/usr/bin/python
 """
 This script is released under the GNU GPL v2 license.
+
+toggle = airport_clientmonitor.StatemachToggle(statemach)
+monitor = airport_clientmonitor.PresenceMonitor(airport_hostname, clients, toggle)
+pressence_service = internet.TimerService(15, monitor.check)
 """
 
 import airport_snmp
