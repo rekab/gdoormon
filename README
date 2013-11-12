@@ -38,11 +38,17 @@ PREREQS:
   #sudo apt-get install python-imaging
 
 
+---
+TESTING
+---
+twistd -ny testing/presence_regtest.py 
+
 
 ---
 TODO:
 ---
   - setup a config file with xmpp login details
+  - add a "manual-only" mode that requires a human
   - better dep management (no apt)
     - pip install virtualenv virtualenvwrapper
     - fysom as git submodule - or from pip
