@@ -5,8 +5,8 @@ from twisted.application import internet
 from twisted.application import service
 from twisted.words.protocols.jabber import jid
 from wokkel import client
-from xmpp import chatcontrol
-from xmpp import test_chatcontrol
+from chatcontrol import xmpp
+from chatcontrol import test_xmpp
 
 # TODO: config file
 USER = os.environ.get('XMPP_USER', 'airvision@hindenburg.org')
@@ -28,6 +28,6 @@ subscribers = set() # TODO: dirdbm
 broadcaster = chatcontrol.ChatBroadcastProtocol(subscribers)
 broadcaster.setHandlerParent(xmppclient)
 
-statemach = test_chatcontrol.FakeStatemach([])
-commander = chatcontrol.ChatCommandReceiverProtocol(statemach, subscribers)
+statemach = test_xmpp.FakeStatemach([])
+commander = xmpp.ChatCommandReceiverProtocol(statemach, subscribers)
 commander.setHandlerParent(xmppclient)

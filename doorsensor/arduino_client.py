@@ -58,12 +58,21 @@ class DoorMeasurementProtocol(protocol.Protocol):
     self.threshold = threshold
 
   def dataReceived(self, data):
-    log.msg('Read from server: %s' % repr(data))
+    log.msg('threshold=%s, read from server: %s' % (self.threshold, repr(data)))
     try:
-      distance = int(data)
-      self.toggle(distance > self.threshold)
-    except ValueError as e:
-      log.msg('Bad data from the server: %s' % repr(data))
+      try:
+        distance = int(data)
+        if distance > self.threshold:
+          log.msg('Door is open.')
+          self.toggle(True)
+        else:
+          log.msg('Door is closed.')
+          self.toggle(False)
+      except ValueError as e:
+        log.msg('Bad data from the server: %s' % repr(data))
+    except Exception as e:
+      import traceback
+      log.msg('caught: %s' % traceback.format_exc(e))
 
   def connectionLost(self, reason):
     if not isinstance(reason, client.ResponseDone):
@@ -82,6 +91,6 @@ class StatemachToggle(object):
 
   def __call__(self, doorOpen):
     if doorOpen:
-      self.statemach.door_open()
+      self.statemach.door_opened()
     else:
       self.statemach.door_closed()

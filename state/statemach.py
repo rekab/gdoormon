@@ -13,7 +13,7 @@ class StateMachine():
   """States:
   - ok                  - all good
   - nobody_home         - door closed, nobody home
-  - door_open           - door open, someone home
+  - door_opened         - door open, someone home
   - alerting            - door open, nobody home or open too long
   - door_closing        - close door command sent
   - door_stuck (TODO)
