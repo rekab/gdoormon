@@ -53,7 +53,6 @@ TODO:
     - pip install virtualenv virtualenvwrapper
     - fysom as git submodule - or from pip
   - reformat this file using markdown
-  - replace consolelog with twisted log
   - snooze timeout warning
   - pylint script
   - broadcast who comes home and last person who left; register name when
