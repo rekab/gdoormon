@@ -25,7 +25,7 @@ class FakeStatemach(object):
 class TestChatProtocolBase(unittest.TestCase):
   def setUp(self):
     self.sent = []
-    self.subscribers = set(['a', 'b', 'c'])
+    self.subscribers = {'a': 1, 'b': 1, 'c': 1}
 
   def mockSend(self, msg):
     self.sent.append(msg)
@@ -41,7 +41,7 @@ class TestBroadcastProtocol(TestChatProtocolBase):
     self.broadcast.sendAllSubscribers('hello')
     self.assertNotEquals(len(self.subscribers), 0)
     for sent in self.sent:
-      self.subscribers.remove(sent['to'])
+      del self.subscribers[sent['to']]
     self.assertEquals(len(self.subscribers), 0)
 
 

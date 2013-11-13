@@ -23,6 +23,17 @@ class StateMachine():
       doorOpenTimeoutSecs=DOOR_OPEN_TIMEOUT_SECS,
       alertTimeoutSecs=ALERT_TIMEOUT_SECS,
       callLater=reactor.callLater, system=os.system): 
+    """
+    Constructor.
+
+    Args:
+      doorOpenTimeoutSecs: Number of seconds to allow the door to be open when
+          someone is home. After this period of time, an alert will fire.
+      alertTimeoutSeconds: Number of seconds after an alert fires until the
+          door is automatically closed.
+      callLater: reactor.callLater callback for testing.
+      system: os.system callback for testing.
+    """
     self.broadcaster = broadcaster
     self.doorControl = doorControl
     self.doorOpenTimeoutSecs = doorOpenTimeoutSecs
@@ -107,7 +118,7 @@ class StateMachine():
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
 
-    message = 'DOOR ALERT! Timeout in %s seconds.' % self.alertTimeoutSecs
+    message = 'DOOR ALERT! Timeout in %s seconds (reply "snooze" to snooze)' % self.alertTimeoutSecs
     self.logAndSpeakMessage(message)
     self.broadcaster.sendAllSubscribers(message)
     self.pendingTimeout = self._callLater(self.alertTimeoutSecs,
@@ -144,6 +155,6 @@ class StateMachine():
     if self.pendingTimeout:
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
-      message = 'Door closed, timeout canceled.'
+      message = 'Door closed, timeout cancelled.'
       self.broadcaster.sendAllSubscribers(message)
       log.msg(message, logLevel=logging.INFO)

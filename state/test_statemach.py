@@ -42,7 +42,7 @@ class StateMachineTest(unittest.TestCase):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'snoozed, will timeout'))
 
   def expectDoorClosedDuringAlertNotice(self):
-    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Door closed, timeout canceled'))
+    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Door closed, timeout cancelled'))
 
   def expectDoorClosingNotice(self):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'closing the door'))

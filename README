@@ -48,6 +48,7 @@ twistd -ny testing/presence_regtest.py
 TODO:
 ---
   - setup a config file with xmpp login details
+  - fix snooze? give help.
   - add a "manual-only" mode that requires a human
   - better dep management (no apt)
     - pip install virtualenv virtualenvwrapper

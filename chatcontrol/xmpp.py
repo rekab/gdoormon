@@ -9,6 +9,10 @@ from wokkel import xmppim
 from wokkel import subprotocols
 
 
+# How long alert snooze lasts.
+DEFAULT_SNOOZE_DURATION = 20
+
+
 class SendMessageMixin:
   def sendMessage(self, body, to): 
     msg = domish.Element((None, 'message'))
@@ -23,7 +27,7 @@ class ChatBroadcastProtocol(SendMessageMixin, xmppim.XMPPHandler):
     self.subscribers = subscribers
 
   def sendAllSubscribers(self, text):
-    for subscriber in self.subscribers:
+    for subscriber in self.subscribers.keys():
       self.sendMessage(text, subscriber)
 
 
@@ -66,14 +70,14 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     return 'bad command'
 
   def command_subscribe(self, sender, cmd_args):
-    self.subscribers.add(sender)
+    self.subscribers[str(sender)] = ''
     msg = '%s subscribed' % sender
     log.msg(msg)
     return msg
 
   def command_unsubscribe(self, sender, cmd_args):
-    if sender in self.subscribers:
-      self.subscribers.remove(sender)
+    if sender in self.subscribers.keys():
+      del self.subscribers[sender]
       msg = '%s unsubscribed' % sender
     else:
       msg = '%s not subscribed' % sender
@@ -82,8 +86,9 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
 
   def command_snooze(self, sender, cmd_args):
     duration = None
-    if not cmd_args:
-      return 'need a duration'
+    if not cmd_args or not cmd_args[0]:
+      duration = DEFAULT_SNOOZE_DURATION
+
     try:
       duration = int(cmd_args[0])
     except ValueError, e:
