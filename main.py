@@ -36,7 +36,8 @@ ARDUINO_POLLING_SECS=5
 
 
 application = service.Application(APP_NAME)
-sc = service.IServiceCollection(application)
+sc = service.MultiService()
+sc.setServiceParent(application)
 
 # Start the client registration server.
 factory = server.Site(registration.GetRegistrationResource())
