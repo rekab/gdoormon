@@ -47,6 +47,7 @@ twistd -ny testing/presence_regtest.py
 ---
 TODO:
 ---
+  - "timeout canceled" message always sent
   - setup a config file with xmpp login details
   - fix snooze? give help.
   - add a "manual-only" mode that requires a human

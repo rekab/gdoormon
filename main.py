@@ -18,22 +18,30 @@ from twisted.web import server
 from twisted.words.protocols.jabber import jid
 from twisted.words.xish import domish
 from wokkel import client
+import ConfigParser
 
+APP_NAME = "gdoormon"
 
 # TODO: all these values should come from a standalone config file, the path
 # should be specified by a flag.
-APP_NAME = "gdoormon"
-AIRPORT_HOSTNAME = "hoth"
 SUBSCRIBER_DIR = os.path.join(os.getenv('HOME'), APP_NAME + '-subscribers')
-XMPP_USER = os.environ.get('XMPP_USER', 'airvision@hindenburg.org')
-if 'XMPP_PASSWD' not in os.environ:
-  raise RuntimeError('set the $XMPP_PASSWD environment variable')
-XMPP_PASSWD = os.environ['XMPP_PASSWD']
-DOOR_OPEN_TIMEOUT_SECS=5
-ALERT_TIMEOUT_SECS=5
-AIRPORT_POLLING_SECS=15
-ARDUINO_POLLING_SECS=5
+CONFIG_FNAME = 'gdoormon.config'
+config_path = os.path.join(os.getcwd(), CONFIG_FNAME)
+if not os.path.exists(config_path):
+  raise RuntimeError("Couldn't find %s" % config_path)
+config = ConfigParser.ConfigParser()
+config.read([config_path])
 
+
+#AIRPORT_HOSTNAME = "hoth"
+#XMPP_USER = os.environ.get('XMPP_USER', 'airvision@hindenburg.org')
+#if 'XMPP_PASSWD' not in os.environ:
+#  raise RuntimeError('set the $XMPP_PASSWD environment variable')
+#XMPP_PASSWD = os.environ['XMPP_PASSWD']
+#DOOR_OPEN_TIMEOUT_SECS=5
+#ALERT_TIMEOUT_SECS=5
+#AIRPORT_POLLING_SECS=15
+#ARDUINO_POLLING_SECS=5
 
 application = service.Application(APP_NAME)
 sc = service.MultiService()
@@ -41,12 +49,15 @@ sc.setServiceParent(application)
 
 # Start the client registration server.
 factory = server.Site(registration.GetRegistrationResource())
-i = internet.TCPServer(8080, factory)
+server_port = int(config.get(APP_NAME, 'server_port'))
+i = internet.TCPServer(server_port, factory)
 i.setServiceParent(sc)
 
 # Start the XMPP service.
+xmpp_user = config.get(APP_NAME, 'xmpp_user')
+xmpp_passwd = config.get(APP_NAME, 'xmpp_passwd')
 xmppclient = client.XMPPClient(
-    jid.internJID('%s/%s' % (XMPP_USER, APP_NAME)), XMPP_PASSWD)
+    jid.internJID('%s/%s' % (xmpp_user, APP_NAME)), xmpp_passwd)
 xmppclient.logTraffic = True
 
 subscribers = dirdbm.DirDBM(SUBSCRIBER_DIR)
@@ -55,24 +66,32 @@ broadcaster.setHandlerParent(xmppclient)
 
 # Setup the state machine and pass it the door controller and xmpp service.
 door_controller = maestro.DoorControl(maestro.PololuMicroMaestro())
-statemach = statemach.StateMachine(broadcaster, door_controller,
-    doorOpenTimeoutSecs=DOOR_OPEN_TIMEOUT_SECS,
-    alertTimeoutSecs=ALERT_TIMEOUT_SECS)
-commander = xmpp.ChatCommandReceiverProtocol(statemach, subscribers)
+door_open_timeout_secs = int(config.get(APP_NAME, 'door_open_timeout_secs'))
+alert_timeout_secs = int(config.get(APP_NAME, 'alert_timeout_secs'))
+sm = statemach.StateMachine(broadcaster, door_controller,
+    doorOpenTimeoutSecs=door_open_timeout_secs,
+    alertTimeoutSecs=alert_timeout_secs)
+commander = xmpp.ChatCommandReceiverProtocol(sm, subscribers)
 commander.setHandlerParent(xmppclient)
 
 xmppclient.setServiceParent(sc)
 
 # Setup a service to poll the airport.
+airport_hostname = config.get(APP_NAME, 'airport_hostname')
+airport_polling_secs = int(config.get(APP_NAME, 'airport_polling_secs'))
 clients = clientdb.getDb()
-presence_toggle = airport_clientmonitor.StatemachToggle(statemach)
+presence_toggle = airport_clientmonitor.StatemachToggle(sm)
 monitor = airport_clientmonitor.PresenceMonitor(
-    AIRPORT_HOSTNAME, clients, presence_toggle)
-presence_service = internet.TimerService(AIRPORT_POLLING_SECS, monitor.check)
+    airport_hostname, clients, presence_toggle)
+presence_service = internet.TimerService(airport_polling_secs, monitor.check)
 presence_service.setServiceParent(sc)
 
 # Setup a service to poll the door sensor.
-toggle = arduino_client.StatemachToggle(statemach)
-sensor = arduino_client.DoorSensor(toggle) # TODO: config
-sensor_service = internet.TimerService(ARDUINO_POLLING_SECS, sensor.check)
+arduino_polling_secs = int(config.get(APP_NAME, 'arduino_polling_secs'))
+arduino_hostname = config.get(APP_NAME, 'arduino_hostname')
+threshold_cm = int(config.get(APP_NAME, 'arduino_threshold_cm'))
+toggle = arduino_client.StatemachToggle(sm)
+sensor = arduino_client.DoorSensor(toggle, hostname=arduino_hostname,
+    threshold=threshold_cm)
+sensor_service = internet.TimerService(arduino_polling_secs, sensor.check)
 sensor_service.setServiceParent(sc)

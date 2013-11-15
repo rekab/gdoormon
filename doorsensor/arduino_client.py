@@ -24,7 +24,7 @@ class DoorSensor(object):
     self.toggle = toggle
     self.hostname = hostname
     self.port = port
-    self.threshold = threshold
+    self.threshold = int(threshold)
     self.requestPath = requestPath
 
   def check(self):
