@@ -48,22 +48,19 @@ twistd -ny testing/presence_regtest.py
 TODO:
 ---
   - "timeout canceled" message always sent
-  - setup a config file with xmpp login details
   - fix snooze? give help.
+  - timeout approaching warning
+  - subscribe to:
+    - when registered clients connect/disconnect
+    - when nobody/somebody is home
+    - when the door changes state
   - add a "manual-only" mode that requires a human
   - better dep management (no apt)
     - pip install virtualenv virtualenvwrapper
     - fysom as git submodule - or from pip
   - reformat this file using markdown
-  - snooze timeout warning
   - pylint script
   - broadcast who comes home and last person who left; register name when
     registering. default to "user1", "user2", etc.
-  - subscribe to:
-    - when registered clients connect/disconnect
-    - when nobody/somebody is home
-    - when the door changes state
   - support dd-wrt/airport interchangeably 
   - support irc
-  - image screensaver
-    - turn screen on during motion

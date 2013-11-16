@@ -148,4 +148,11 @@ class StateMachineTest(unittest.TestCase):
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS)
     self.m.VerifyAll()
 
+  def testDoorClosedWhileSomeoneHome(self):
+    self.m.ReplayAll()
+    os.system('pymox MultipleTimes() needs a zero-times option')
+    self.statemach.door_opened()
+    self.statemach.door_closed()
+    self.m.VerifyAll()
+
   # todo someone_home repeatedly?

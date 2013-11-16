@@ -1,7 +1,7 @@
 #!/usr/bin/twistd -ny
 import os
 import sys
-sys.path.append('.') # todo: parse argv[0]
+sys.path.append('.')
 
 from chatcontrol import xmpp
 from doorcontrol import maestro
@@ -20,12 +20,13 @@ from twisted.words.xish import domish
 from wokkel import client
 import ConfigParser
 
+# Constants.
 APP_NAME = "gdoormon"
-
-# TODO: all these values should come from a standalone config file, the path
-# should be specified by a flag.
-SUBSCRIBER_DIR = os.path.join(os.getenv('HOME'), APP_NAME + '-subscribers')
 CONFIG_FNAME = 'gdoormon.config'
+
+# Load the config.
+# TODO: file paths should be specified by a flag.
+subscriber_dir = os.path.join(os.getenv('HOME'), APP_NAME + '-subscribers')
 config_path = os.path.join(os.getcwd(), CONFIG_FNAME)
 if not os.path.exists(config_path):
   raise RuntimeError("Couldn't find %s" % config_path)
@@ -33,16 +34,7 @@ config = ConfigParser.ConfigParser()
 config.read([config_path])
 
 
-#AIRPORT_HOSTNAME = "hoth"
-#XMPP_USER = os.environ.get('XMPP_USER', 'airvision@hindenburg.org')
-#if 'XMPP_PASSWD' not in os.environ:
-#  raise RuntimeError('set the $XMPP_PASSWD environment variable')
-#XMPP_PASSWD = os.environ['XMPP_PASSWD']
-#DOOR_OPEN_TIMEOUT_SECS=5
-#ALERT_TIMEOUT_SECS=5
-#AIRPORT_POLLING_SECS=15
-#ARDUINO_POLLING_SECS=5
-
+# Setup the application.
 application = service.Application(APP_NAME)
 sc = service.MultiService()
 sc.setServiceParent(application)
@@ -50,17 +42,18 @@ sc.setServiceParent(application)
 # Start the client registration server.
 factory = server.Site(registration.GetRegistrationResource())
 server_port = int(config.get(APP_NAME, 'server_port'))
-i = internet.TCPServer(server_port, factory)
-i.setServiceParent(sc)
+registration_server = internet.TCPServer(server_port, factory)
+registration_server.setServiceParent(sc)
 
-# Start the XMPP service.
+# Setup the XMPP service.
 xmpp_user = config.get(APP_NAME, 'xmpp_user')
 xmpp_passwd = config.get(APP_NAME, 'xmpp_passwd')
 xmppclient = client.XMPPClient(
     jid.internJID('%s/%s' % (xmpp_user, APP_NAME)), xmpp_passwd)
 xmppclient.logTraffic = True
+xmppclient.setServiceParent(sc)
 
-subscribers = dirdbm.DirDBM(SUBSCRIBER_DIR)
+subscribers = dirdbm.DirDBM(subscriber_dir)
 broadcaster = xmpp.ChatBroadcastProtocol(subscribers)
 broadcaster.setHandlerParent(xmppclient)
 
@@ -74,9 +67,7 @@ sm = statemach.StateMachine(broadcaster, door_controller,
 commander = xmpp.ChatCommandReceiverProtocol(sm, subscribers)
 commander.setHandlerParent(xmppclient)
 
-xmppclient.setServiceParent(sc)
-
-# Setup a service to poll the airport.
+# Setup a service to poll the airport, and pass it the state machine.
 airport_hostname = config.get(APP_NAME, 'airport_hostname')
 airport_polling_secs = int(config.get(APP_NAME, 'airport_polling_secs'))
 clients = clientdb.getDb()
@@ -86,7 +77,7 @@ monitor = airport_clientmonitor.PresenceMonitor(
 presence_service = internet.TimerService(airport_polling_secs, monitor.check)
 presence_service.setServiceParent(sc)
 
-# Setup a service to poll the door sensor.
+# Setup a service to poll the door sensor, and pass it the state machine.
 arduino_polling_secs = int(config.get(APP_NAME, 'arduino_polling_secs'))
 arduino_hostname = config.get(APP_NAME, 'arduino_hostname')
 threshold_cm = int(config.get(APP_NAME, 'arduino_threshold_cm'))

@@ -107,6 +107,9 @@ class StateMachine():
 
   def startDoorOpenTimer(self, e):
     if self.pendingTimeout:
+      # The existing timer must be for the door alert. This can happen if the
+      # door is open, nobody is home, we enter the alert state, and then
+      # someone comes home.
       assert e.src == 'alerting'
       self.pendingTimeout.cancel()
     self.pendingTimeout = self._callLater(self.doorOpenTimeoutSecs,
@@ -114,9 +117,9 @@ class StateMachine():
 
   def setAlertCondition(self, e):
     if self.pendingTimeout:
+      # The door was open and someone was home, but then everyone left.
       assert e.src == 'door_open'
       self.pendingTimeout.cancel()
-      self.pendingTimeout = None
 
     message = 'DOOR ALERT! Timeout in %s seconds (reply "snooze" to snooze)' % self.alertTimeoutSecs
     self.logAndSpeakMessage(message)
@@ -155,6 +158,8 @@ class StateMachine():
     if self.pendingTimeout:
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
-      message = 'Door closed, timeout cancelled.'
-      self.broadcaster.sendAllSubscribers(message)
-      log.msg(message, logLevel=logging.INFO)
+      # If we were alerting, let the user know they don't need to worry.
+      if e.src == 'alerting':
+        message = 'Door closed, timeout cancelled.'
+        self.broadcaster.sendAllSubscribers(message)
+        log.msg(message, logLevel=logging.INFO)
