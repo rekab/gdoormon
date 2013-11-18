@@ -8,11 +8,12 @@ from wokkel import client
 from chatcontrol import xmpp
 from chatcontrol import test_xmpp
 
-# TODO: config file
-USER = os.environ.get('XMPP_USER', 'airvision@hindenburg.org')
+if 'XMPP_USER' not in os.environ:
+  raise RuntimeError('set the $XMPP_USER environment variable')
 if 'XMPP_PASSWD' not in os.environ:
   raise RuntimeError('set the $XMPP_PASSWD environment variable')
 
+USER = os.environ['XMPP_USER']
 PASSWD = os.environ['XMPP_PASSWD']
 
 app_name = "chatcontrol_regtest"
