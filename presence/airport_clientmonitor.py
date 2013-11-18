@@ -49,14 +49,20 @@ class PresenceMonitor(object):
     return self._someone_home
 
   def setPresenceDetected(self, b):
-    if self._someone_home is None:
-      log.msg('initializing someone_home=%s' % b)
-      self._someone_home = b
-    else:
-      if self._someone_home != b:
-        log.msg('toggling someone_home=%s' % b)
-        self._someone_home = b
-        self._toggleCallback(b)
+    self._toggleCallback(b)
+    ## XXX:
+    ## door open -> nobody home -> door closing -> ok -> door_open
+    #log.msg('someone_home=%s' % b)
+    #if self._someone_home is None:
+    #  log.msg('initializing someone_home=%s' % b)
+    #  self._someone_home = b
+    #else:
+    #  if self._someone_home != b:
+    #    log.msg('toggling someone_home=%s' % b)
+    #    self._someone_home = b
+    #    self._toggleCallback(b)
+    #  else:
+    #    log.msg('leaving self._someone_home=%s' % self._someone_home)
 
 
 class StatemachToggle(object):

@@ -65,7 +65,8 @@ class StateMachine():
           dict(name='command_close_door', src=['nobody_home'], dst='nobody_home'),
           dict(name='command_close_door', src=['ok'], dst='ok'),
 
-          dict(name='door_closed', src=['ok', 'nobody_home', 'alerting', 'door_open', 'door_closing'], dst='ok'),
+          dict(name='door_closed', src=['ok', 'alerting', 'door_open', 'door_closing'], dst='ok'),
+          dict(name='door_closed', src=['nobody_home'], dst='nobody_home'),
         ],
         'callbacks': {
           'onchangestate': self.logStateChange,

@@ -89,6 +89,7 @@ TODO:
     - when nobody/somebody is home
     - when the door changes state
   - add a "manual-only" mode that requires a human
+  - needs a way to start the server on boot
   - pylint script
   - broadcast who comes home and last person who left; register name when
     registering. default to "user1", "user2", etc.
