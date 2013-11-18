@@ -18,6 +18,10 @@ from twisted.web import http
 from twisted.internet import protocol
 
 
+# Stop the log spam.
+client._HTTP11ClientFactory.noisy = False
+
+
 class DoorSensor(object):
   def __init__(self, toggle, hostname=ARDUINO_HOSTNAME, port=ARDUINO_PORT,
       threshold=THRESHOLD_CM, requestPath=REQUEST_PATH):
@@ -58,15 +62,15 @@ class DoorMeasurementProtocol(protocol.Protocol):
     self.threshold = threshold
 
   def dataReceived(self, data):
-    log.msg('threshold=%s, read from server: %s' % (self.threshold, repr(data)))
+    msg = 'threshold=%s, read from server: %s' % (self.threshold, data)
     try:
       try:
         distance = int(data)
         if distance > self.threshold:
-          log.msg('Door is open.')
+          log.msg('Door is open: %s.' % msg)
           self.toggle(True)
         else:
-          log.msg('Door is closed.')
+          log.msg('Door is closed: %s.' % msg)
           self.toggle(False)
       except ValueError as e:
         log.msg('Bad data from the server: %s' % repr(data))
