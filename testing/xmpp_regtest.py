@@ -26,7 +26,7 @@ xmppclient.logTraffic = True
 xmppclient.setServiceParent(sc)
 
 subscribers = set() # TODO: dirdbm
-broadcaster = chatcontrol.ChatBroadcastProtocol(subscribers)
+broadcaster = xmpp.ChatBroadcastProtocol(subscribers)
 broadcaster.setHandlerParent(xmppclient)
 
 statemach = test_xmpp.FakeStatemach([])
