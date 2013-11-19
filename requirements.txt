@@ -1,4 +1,5 @@
 pyserial==2.7
+pyOpenSSL==0.13.1
 twisted==13.2.0
 wokkel==0.7.0   # xmpp chat lib
 mox==0.5.3      # for tests
