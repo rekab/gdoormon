@@ -1,6 +1,6 @@
-pyserial==2.7
-pyOpenSSL==0.13.1
-twisted==13.2.0
-wokkel==0.7.0   # xmpp chat lib
-mox==0.5.3      # for tests
-#fysom==1.0.8   # todo: pip version uses different function names
+pyserial==2.7           # pololu
+pyOpenSSL==0.13.1       # gchat
+twisted==13.2.0         # everything
+wokkel==0.7.0           # xmpp chat lib
+mox==0.5.3              # tests
+#fysom==1.0.8           # todo: pip version uses different function names
