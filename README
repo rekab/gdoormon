@@ -61,7 +61,13 @@ Edit example.confg and update values as appropriate. Run the server (see
 start.sh). Connect to the server in your browser using your phone and
 register your phone.
 
-If you want to start it on boot, copy gdoormon.service to /etc/systemd/system
+If you want to start it on boot: 
+  If your distro uses systemd:
+    - copy gdoormon.service to /etc/systemd/system
+  else:
+    - edit /etc/rc.local to call gdoormonctl.sh
+    - edit /etc/logrotate.conf to clean up logs
+
 
 
 ---

@@ -1,10 +1,10 @@
-# Edit the paths in this file and copy it to
+# If your linux distro uses systemd, edit the paths in this file and copy it to
 # /etc/systemd/system/gdoormon.service
 [Unit]
 Description=gdoormon
 
 [Service]
-ExecStart=/home/pi/code/gdoormon/start.sh
+ExecStart=/home/pi/code/gdoormon/start.sh --pidfile= -n
 WorkingDirectory=/home/pi/code/gdoormon
 
 User=pi

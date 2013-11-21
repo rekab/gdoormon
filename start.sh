@@ -8,4 +8,4 @@ if [ ! -d deps ] ; then
   exit 1
 fi
 . deps/bin/activate
-deps/bin/twistd --pidfile= -ny $dir/main.py
+deps/bin/twistd --pidfile=/tmp/gdoormon.pid -y $* $dir/main.py

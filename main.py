@@ -14,6 +14,8 @@ from state import statemach
 from twisted.application import internet
 from twisted.application import service
 from twisted.persisted import dirdbm
+from twisted.python import log
+from twisted.python import logfile
 from twisted.web import server
 from twisted.words.protocols.jabber import jid
 from twisted.words.xish import domish
@@ -24,9 +26,17 @@ import ConfigParser
 APP_NAME = "gdoormon"
 CONFIG_FNAME = 'gdoormon.config'
 
+homedir = os.getenv('HOME')
+
+# Setup logging
+log.startLogging(
+    logfile.LogFile.fromFullPath(
+        './' + APP_NAME + '.log', maxRotatedFiles=20),
+    setStdout=os.isatty(sys.stdout.fileno()))
+
 # Load the config.
 # TODO: file paths should be specified by a flag.
-subscriber_dir = os.path.join(os.getenv('HOME'), APP_NAME + '-subscribers')
+subscriber_dir = os.path.join(homedir, APP_NAME + '-subscribers')
 config_path = os.path.join(os.getcwd(), CONFIG_FNAME)
 if not os.path.exists(config_path):
   raise RuntimeError("Couldn't find %s" % config_path)
