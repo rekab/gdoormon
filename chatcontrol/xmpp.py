@@ -9,7 +9,7 @@ from wokkel import xmppim
 from wokkel import subprotocols
 
 
-# How long alert snooze lasts.
+# How long alert snooze lasts (in seconds).
 DEFAULT_SNOOZE_DURATION = 20
 
 
