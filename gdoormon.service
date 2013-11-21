@@ -4,7 +4,7 @@
 Description=gdoormon
 
 [Service]
-ExecStart=/home/pi/code/gdoormon/start.sh --pidfile= -n
+ExecStart=/home/pi/code/gdoormon/start.sh start -n
 WorkingDirectory=/home/pi/code/gdoormon
 
 User=pi
