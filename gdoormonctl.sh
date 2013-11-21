@@ -1,8 +1,9 @@
 #!/bin/bash
 
-PIDFILE=/tmp/gdoormon.pid
 set -e
 dir=$(dirname $0)
+PIDFILE=$dir/gdoormon.pid
+
 cd $dir
 if [ ! -d deps ] ; then
   echo '"deps" directory missing: check virtualenv setup' >2
@@ -30,6 +31,7 @@ start)
   if is_running ; then
     echo "process is already running"
   else
+    set -x
     deps/bin/twistd --pidfile=$PIDFILE -y $FLAGS $dir/main.py
   fi
   ;;
