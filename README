@@ -25,17 +25,18 @@ DEPENDENCIES
   sudo apt-get install build-essential python-dev
   sudo apt-get install python-virtualenv
   sudo apt-get install libsnmp-python
-  sudo apt-get install python3-openssl
 
-  # Install python modules.
-  cd gdoormon
+  # Setup virtualenv and install python modules.
+  cd gdoormon  # or whichever dir this README file lives
   virtualenv --system-site-packages deps
   source deps/bin/activate
   pip install -r requirements.txt
 
+  # Or use these if you're not using virtualenv:
   # Comes from pip/requirements.txt:
-  #sudo apt-get install wokkel        # also installs twisted
-  #sudo apt-get install python-mox    # for tests
+  #sudo apt-get install wokkel          # also installs twisted
+  #sudo apt-get install python-mox      # for tests
+  #sudo apt-get install python-openssl  # for xmpp
   # Added as git submodule, not needed:
   #wget https://github.com/oxplot/fysom/blob/master/fysom.py
 
@@ -56,8 +57,11 @@ Run these after install deps to verify everything is working:
 CONFIGURE AND START THE SERVER
 ---
 
-Edit example.confg and update values as appropriate. Run the server. Connect to
-the server in your browser using your phone and register your phone.
+Edit example.confg and update values as appropriate. Run the server (see
+start.sh). Connect to the server in your browser using your phone and
+register your phone.
+
+If you want to start it on boot, copy gdoormon.service to /etc/systemd/system
 
 
 ---
@@ -84,6 +88,7 @@ TODO:
 ---
   - reformat this file using markdown
   - fix snooze? give help.
+  - ask for state using chat
   - timeout approaching warning
   - subscribe to:
     - when registered clients connect/disconnect

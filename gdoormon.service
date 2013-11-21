@@ -1,0 +1,18 @@
+# Edit the paths in this file and copy it to
+# /etc/systemd/system/gdoormon.service
+[Unit]
+Description=gdoormon
+
+[Service]
+ExecStart=/home/pi/code/gdoormon/start.sh
+WorkingDirectory=/home/pi/code/gdoormon
+
+User=pi
+Group=pi
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+# vim: ft=config
