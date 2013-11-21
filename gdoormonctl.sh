@@ -21,7 +21,7 @@ FLAGS=$*
 case $COMMAND in
 status)
   if is_running ; then
-    echo "process is alive as pid " $(cat PIDFILE)
+    echo "process is alive as pid " $(cat $PIDFILE)
   else
     echo "process is dead"
   fi
@@ -36,7 +36,7 @@ start)
 stop)
   if is_running ; then
     set -x
-    kill $(cat PIDFILE)
+    kill $(cat $PIDFILE)
   else
     echo "process is not running"
     exit 1
