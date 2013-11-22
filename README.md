@@ -8,10 +8,10 @@ clients need to register their MAC address via the webserver started on port
 8080.
 
 Determines if the door is open using an Arduino with an HC-SR04 rangefinder and
-ethernet shield. See ```doorsensor/arduino_sensor_server/``` for more details.
+Ethernet shield. See ```doorsensor/arduino_sensor_server/``` for more details.
 
 Before it shuts the door, it alerts subscribers via XMPP that the door
-will be shutting; the alert and door closure can be snoozed via XMPP.
+will be shutting; the alert can be snoozed via XMPP.
 
 Shuts the door using an Pololu Micro Maestro server controller to drive a
 servo to hit a button (e.g. garage door remote button).
@@ -51,13 +51,12 @@ about 30cm.
 
 ### Setup the Maestro
 
-#### Enable "USB Dual Port" on the Maestro
+Enable "USB Dual Port" on the Maestro. The Pololu Maestro Control Center can
+set this.
 
-The Pololu Maestro Control Center can set this.
+Then strap the servo to a garage door remote. You can tweak the servo angles
+defined in ```doorcontrol/maestro.py``` 
 
-#### Strap the servo to a garage door remote
-
-You may need to tweak the servo angles defined in ```doorcontrol/maestro.py```
 Using a relay wired to a door controller is planned, but a servo was more fun.
 
 ## Software Deps
@@ -187,5 +186,3 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
   - [ ] support dd-wrt
   - [ ] drop pololu+servo, use a wired relay
   - [ ] support irc
-
-vim: set ft=markdown
