@@ -23,7 +23,7 @@ from wokkel import client
 import ConfigParser
 
 # Constants.
-APP_NAME = "gdoormon"
+APP_NAME = 'gdoormon'
 CONFIG_FNAME = 'gdoormon.config'
 
 homedir = os.getenv('HOME')
