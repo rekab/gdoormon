@@ -90,7 +90,7 @@ class StateMachine():
     raise AttributeError('Unknown attribute "%s"' % attr)
 
   def logAndSpeakMessage(self, message):
-    log.msg(message, logLevel=logging.INFO)
+    log.msg('speaking %s' % message, logLevel=logging.INFO)
     self._system('espeak "%s" &' % message)
 
   def logStateChange(self, e):

@@ -27,6 +27,8 @@ class ChatBroadcastProtocol(SendMessageMixin, xmppim.XMPPHandler):
     self.subscribers = subscribers
 
   def sendAllSubscribers(self, text):
+    log.msg('broadcasting message to %d subscribers: %s' %
+        (len(self.subscribers), text))
     for subscriber in self.subscribers.keys():
       self.sendMessage(text, subscriber)
 

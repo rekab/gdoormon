@@ -29,10 +29,10 @@ CONFIG_FNAME = 'gdoormon.config'
 homedir = os.getenv('HOME')
 
 # Setup logging
-log.startLogging(
-    logfile.LogFile.fromFullPath(
-        './' + APP_NAME + '.log', maxRotatedFiles=20),
-    setStdout=os.isatty(sys.stdout.fileno()))
+#log.startLogging(
+#    logfile.LogFile.fromFullPath(
+#        './' + APP_NAME + '.log', maxRotatedFiles=20),
+#    setStdout=os.isatty(sys.stdout.fileno()))
 
 # Load the config.
 # TODO: file paths should be specified by a flag.
