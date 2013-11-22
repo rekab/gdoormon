@@ -3,5 +3,6 @@
 _trial_temp
 deps
 gdoormon.config
-gdoormon.log
+gdoormon.log*
 gdoormon.pid
+build

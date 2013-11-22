@@ -28,12 +28,6 @@ CONFIG_FNAME = 'gdoormon.config'
 
 homedir = os.getenv('HOME')
 
-# Setup logging
-#log.startLogging(
-#    logfile.LogFile.fromFullPath(
-#        './' + APP_NAME + '.log', maxRotatedFiles=20),
-#    setStdout=os.isatty(sys.stdout.fileno()))
-
 # Load the config.
 # TODO: file paths should be specified by a flag.
 subscriber_dir = os.path.join(homedir, APP_NAME + '-subscribers')
@@ -46,6 +40,14 @@ config.read([config_path])
 
 # Setup the application.
 application = service.Application(APP_NAME)
+
+# Setup logging: write to stdout if it's a tty, and write to rotated log files.
+if os.isatty(sys.stdout.fileno()):
+  log.startLogging(sys.stdout)
+outputLog = logfile.LogFile.fromFullPath(APP_NAME + '.log', maxRotatedFiles=20)
+application.setComponent(log.ILogObserver, log.FileLogObserver(outputLog).emit)
+
+
 sc = service.MultiService()
 sc.setServiceParent(application)
 
