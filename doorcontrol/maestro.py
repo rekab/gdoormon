@@ -1,6 +1,6 @@
 """Garage door button presser.
 
-Requires the pololu micro maestro, set in "USB Dual Port" mode.
+Requires a Pololu Micro Maestro set in "USB Dual Port" mode.
 """
 import logging
 import serial
