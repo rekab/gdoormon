@@ -64,119 +64,117 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     self.receiver.onMessage(msg)
 
   def testHelp(self):
-    self.receiveFakeMessage('help me!', 'foo')
+    self.receiveFakeMessage('help me!', 'foo@example.com/zzzz')
     self.assertEquals(1, len(self.sent))
     self.assertEquals('help yourself', str(self.sent[0].body))
     # Verify the statemach wasn't touched
     self.assertEquals(0, len(self.statemach.called))
 
+  def testMalformedFromAddress(self):
+    self.receiveFakeMessage('help me!', '~~~bogus~~~')
+    self.assertEquals(0, len(self.sent))
+    self.assertEquals(0, len(self.statemach.called))
+
   def testSubscribe(self):
     # unsubscribe
-    self.receiveFakeMessage('unsubscribe', 'so-and-so')
-    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' not in self.subscribers)
+    self.receiveFakeMessage('unsubscribe', 'foo@example.com/asdf')
+    self.assertEquals(
+        'foo@example.com is not subscribed', str(self.sent.pop().body))
+    self.assertTrue('foo' not in self.subscribers)
 
     # subscribe with missing password
-    self.receiveFakeMessage('subscribe', 'so-and-so')
+    self.receiveFakeMessage('subscribe', 'foo@example.com/asdf')
     self.assertEquals('usage: subscribe <password>', str(self.sent.pop().body))
-    self.assertFalse('so-and-so' in self.subscribers)
+    self.assertFalse('foo' in self.subscribers)
 
     # subscribe with bad password
-    self.receiveFakeMessage('subscribe asdf', 'so-and-so')
+    self.receiveFakeMessage('subscribe asdf', 'foo@example.com/asdf')
     self.assertEquals('bad password', str(self.sent.pop().body))
-    self.assertFalse('so-and-so' in self.subscribers)
+    self.assertFalse('foo@example.com' in self.subscribers)
 
     # subscribe with good password
-    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'so-and-so')
-    self.assertEquals('so-and-so subscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' in self.subscribers)
+    self.receiveFakeMessage(
+        'subscribe %s' % TEST_PASSWORD, 'foo@example.com/asdf')
+    self.assertEquals('foo@example.com subscribed', str(self.sent.pop().body))
+    self.assertTrue('foo@example.com' in self.subscribers)
 
-    # unsubscribe
-    self.receiveFakeMessage('unsubscribe', 'so-and-so')
-    self.assertEquals('so-and-so unsubscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' not in self.subscribers)
+    # unsubscribe (from a different resource)
+    self.receiveFakeMessage('unsubscribe', 'foo@example.com/quux')
+    self.assertEquals(
+        'foo@example.com unsubscribed', str(self.sent.pop().body))
+    self.assertTrue('foo@example.com' not in self.subscribers)
     self.assertEquals(0, len(self.sent))
 
     # unsubscribe: should be an error
-    self.receiveFakeMessage('unsubscribe', 'so-and-so')
-    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' not in self.subscribers)
+    self.receiveFakeMessage('unsubscribe', 'foo@example.com/asdf')
+    self.assertEquals(
+        'foo@example.com is not subscribed', str(self.sent.pop().body))
+    self.assertTrue('foo@example.com' not in self.subscribers)
     self.assertEquals(0, len(self.sent))
 
     # Verify the statemach wasn't touched
     self.assertEquals(0, len(self.statemach.called))
 
   def testStateMachCall(self):
-    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'foo')
-    self.assertEquals('foo subscribed', str(self.sent.pop().body))
+    self.receiveFakeMessage(
+        'subscribe %s' % TEST_PASSWORD, 'foo@example.com/asdf')
+    self.assertEquals('foo@example.com subscribed', str(self.sent.pop().body))
     self.assertEquals(0, len(self.statemach.called))
 
-    self.receiveFakeMessage('test_command with args', 'foo')
+    self.receiveFakeMessage('test_command with args', 'foo@example.com/asdf')
     self.assertEquals('ok', str(self.sent.pop().body))
     self.assertEquals(1, len(self.statemach.called))
     self.assertEquals(
         ('command_test_command',
           (),
-          {'args': ['with', 'args'], 'sender': 'foo'}),
+          {'args': ['with', 'args'], 'sender': 'foo@example.com'}),
         self.statemach.called.pop())
     self.assertEquals(0, len(self.statemach.called))
 
-#  def testInvalidCommand(self):
-#    self.receiveFakeMessage('hey are you there?', 'foo')
-#    self.assertEquals(0, len(self.statemach.called))
-#    self.assertEquals('so-and-so unsubscribed', str(self.sent.pop().body))
-#    self.assertTrue('so-and-so' not in self.subscribers)
-#    self.assertEquals(0, len(self.sent))
-#
-#  def testStateMachCall(self):
-#    self.assertEquals(0, len(self.statemach.called))
-#    self.receiveFakeMessage('test_command with args', 'foo')
-#    self.assertEquals(
-#        ('command_test_command', 'foo', ['with', 'args']),
-#        self.statemach.called.pop())
-#    self.assertEquals(0, len(self.statemach.called))
-
   def testInvalidCommand(self):
     # test unsubscribed user
-    self.receiveFakeMessage('hey are you there?', 'foo')
+    self.receiveFakeMessage('hey are you there?', 'foo@example.com/asdf')
     self.assertEquals(0, len(self.statemach.called))
     self.assertEquals(
         'not subscribed; send subscribe <password>', str(self.sent.pop().body))
     self.assertEquals(0, len(self.sent))
 
     # subscribe with good password
-    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'foo')
-    self.assertEquals('foo subscribed', str(self.sent.pop().body))
+    self.receiveFakeMessage(
+        'subscribe %s' % TEST_PASSWORD, 'foo@example.com/zxcv')
+    self.assertEquals('foo@example.com subscribed', str(self.sent.pop().body))
 
     # test bogus text
-    self.receiveFakeMessage('hey are you there?', 'foo')
+    self.receiveFakeMessage('hey are you there?', 'foo@example.com/asdf')
     self.assertEquals(0, len(self.statemach.called))
     self.assertEquals('bad command', str(self.sent.pop().body))
     self.assertEquals(0, len(self.sent))
 
   def testSnooze(self):
     # subscribe with bad password
-    self.receiveFakeMessage('subscribe asdf', 'so-and-so')
+    self.receiveFakeMessage('subscribe asdf', 'foo@example.com/asdf')
     self.assertEquals('bad password', str(self.sent.pop().body))
-    self.assertFalse('so-and-so' in self.subscribers)
+    self.assertFalse('foo@example.com' in self.subscribers)
 
     # attempt to snooze: should be ignored
-    self.receiveFakeMessage('snooze 10', 'so-and-so')
-    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
+    self.receiveFakeMessage('snooze 10', 'foo@example.com/asdf')
+    self.assertEquals(
+        'foo@example.com is not subscribed', str(self.sent.pop().body))
     self.assertEquals(0, len(self.statemach.called))
 
     # subscribe with good password
-    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'so-and-so')
-    self.assertEquals('so-and-so subscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' in self.subscribers)
+    self.receiveFakeMessage(
+        'subscribe %s' % TEST_PASSWORD, 'foo@example.com/asdf')
+    self.assertEquals('foo@example.com subscribed', str(self.sent.pop().body))
+    self.assertTrue('foo@example.com' in self.subscribers)
 
     # snooze with bad number
-    self.receiveFakeMessage('snooze plz', 'so-and-so')
+    self.receiveFakeMessage('snooze plz', 'foo@example.com/zxcv')
     self.assertEquals('cannot parse "plz"', str(self.sent.pop().body))
     self.assertEquals(0, len(self.statemach.called))
 
     # valid snooze
-    self.receiveFakeMessage('snooze 10', 'so-and-so')
+    self.receiveFakeMessage('snooze 10', 'foo@example.com/zxcv')
     self.assertEquals('ok', str(self.sent.pop().body))
     self.assertEquals(1, len(self.statemach.called))
 

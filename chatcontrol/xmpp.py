@@ -60,9 +60,18 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       return
     command_match = self.command_re.match(str(msg.body))
     if command_match:
-      log.msg('dispatching command: %s' % msg.body)
+      # Split the JID address from the resource.
+      sender = msg["from"]
+      jid_parts = sender.split('/', 2)
+      if len(jid_parts) != 2:
+        log.msg('malformed sender address: %s' % sender)
+        return 'internal error'
+      address = jid_parts[0]
+
+      # Dispatch the command.
+      log.msg('dispatching command from %s: %s' % (address, msg.body))
       result = self.dispatchCommand(
-          msg["from"], command_match.group(1),
+          address, command_match.group(1),
           re.split('\s+', command_match.group(2)))
     else:
       log.msg('Got bogus message: %s' % msg.body)
@@ -114,11 +123,8 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
 
   @requiresAuthentication
   def command_unsubscribe(self, sender, cmd_args):
-    if sender in self.subscribers.keys():
-      del self.subscribers[sender]
-      msg = '%s unsubscribed' % sender
-    else:
-      msg = '%s not subscribed' % sender
+    del self.subscribers[str(sender)]
+    msg = '%s unsubscribed' % sender
     log.msg(msg)
     return msg
 
