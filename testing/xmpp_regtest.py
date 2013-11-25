@@ -26,7 +26,7 @@ xmppclient = client.XMPPClient(jid.internJID('%s/%s' % (USER, app_name)), PASSWD
 xmppclient.logTraffic = True
 xmppclient.setServiceParent(sc)
 
-subscribers = set() # TODO: dirdbm
+subscribers = {}
 broadcaster = xmpp.ChatBroadcastProtocol(subscribers)
 broadcaster.setHandlerParent(xmppclient)
 

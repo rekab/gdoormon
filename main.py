@@ -40,16 +40,14 @@ config.read([config_path])
 
 # Setup the application.
 application = service.Application(APP_NAME)
+sc = service.MultiService()
+sc.setServiceParent(application)
 
 # Setup logging: write to stdout if it's a tty, and write to rotated log files.
 if os.isatty(sys.stdout.fileno()):
   log.startLogging(sys.stdout)
 outputLog = logfile.LogFile.fromFullPath(APP_NAME + '.log', maxRotatedFiles=20)
 application.setComponent(log.ILogObserver, log.FileLogObserver(outputLog).emit)
-
-
-sc = service.MultiService()
-sc.setServiceParent(application)
 
 # Start the client registration server.
 factory = server.Site(registration.GetRegistrationResource())
@@ -76,7 +74,9 @@ alert_timeout_secs = int(config.get(APP_NAME, 'alert_timeout_secs'))
 sm = statemach.StateMachine(broadcaster, door_controller,
     doorOpenTimeoutSecs=door_open_timeout_secs,
     alertTimeoutSecs=alert_timeout_secs)
-commander = xmpp.ChatCommandReceiverProtocol(sm, subscribers)
+
+bot_passwd = config.get(APP_NAME, 'bot_passwd')
+commander = xmpp.ChatCommandReceiverProtocol(sm, subscribers, bot_passwd)
 commander.setHandlerParent(xmppclient)
 
 # Setup a service to poll the airport, and pass it the state machine.
