@@ -15,6 +15,7 @@ if 'XMPP_PASSWD' not in os.environ:
 
 USER = os.environ['XMPP_USER']
 PASSWD = os.environ['XMPP_PASSWD']
+GDOORMON_PASSWD = 'hunter2'
 
 app_name = "chatcontrol_regtest"
 application = service.Application(app_name)
@@ -30,5 +31,6 @@ broadcaster = xmpp.ChatBroadcastProtocol(subscribers)
 broadcaster.setHandlerParent(xmppclient)
 
 statemach = test_xmpp.FakeStatemach([])
-commander = xmpp.ChatCommandReceiverProtocol(statemach, subscribers)
+commander = xmpp.ChatCommandReceiverProtocol(
+    statemach, subscribers, GDOORMON_PASSWD)
 commander.setHandlerParent(xmppclient)

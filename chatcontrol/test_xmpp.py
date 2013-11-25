@@ -5,6 +5,9 @@ from twisted.words.xish import domish
 import xmpp
 
 
+TEST_PASSWORD = 'hunter2'
+
+
 class FakeStatemach(object):
   def __init__(self, valid_commands):
     self.valid_commands = valid_commands
@@ -15,10 +18,10 @@ class FakeStatemach(object):
 
   def __getattr__(self, attr):
     """Return a lambda that records the call to the statemach."""
-    return lambda sender, args: self.recordCall(attr, sender=sender, args=args)
+    return lambda *args, **kw: self.recordCall(attr, *args, **kw)
 
-  def recordCall(self, attr, sender=None, args=None):
-    self.called.append((attr, sender, args))
+  def recordCall(self, attr, *args, **kw):
+    self.called.append((attr, args, kw))
     return 'ok'
 
 
@@ -50,7 +53,7 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     TestChatProtocolBase.setUp(self)
     self.statemach = FakeStatemach(set(['command_test_command']))
     self.receiver = xmpp.ChatCommandReceiverProtocol(
-        self.statemach, self.subscribers)
+        self.statemach, self.subscribers, TEST_PASSWORD)
     self.patch(self.receiver, 'send', self.mockSend)
 
   def receiveFakeMessage(self, text, sender):
@@ -70,11 +73,21 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
   def testSubscribe(self):
     # unsubscribe
     self.receiveFakeMessage('unsubscribe', 'so-and-so')
-    self.assertEquals('so-and-so not subscribed', str(self.sent.pop().body))
+    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
     self.assertTrue('so-and-so' not in self.subscribers)
 
-    # subscribe
+    # subscribe with missing password
     self.receiveFakeMessage('subscribe', 'so-and-so')
+    self.assertEquals('usage: subscribe <password>', str(self.sent.pop().body))
+    self.assertFalse('so-and-so' in self.subscribers)
+
+    # subscribe with bad password
+    self.receiveFakeMessage('subscribe asdf', 'so-and-so')
+    self.assertEquals('bad password', str(self.sent.pop().body))
+    self.assertFalse('so-and-so' in self.subscribers)
+
+    # subscribe with good password
+    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'so-and-so')
     self.assertEquals('so-and-so subscribed', str(self.sent.pop().body))
     self.assertTrue('so-and-so' in self.subscribers)
 
@@ -84,37 +97,86 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     self.assertTrue('so-and-so' not in self.subscribers)
     self.assertEquals(0, len(self.sent))
 
+    # unsubscribe: should be an error
+    self.receiveFakeMessage('unsubscribe', 'so-and-so')
+    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
+    self.assertTrue('so-and-so' not in self.subscribers)
+    self.assertEquals(0, len(self.sent))
+
     # Verify the statemach wasn't touched
     self.assertEquals(0, len(self.statemach.called))
 
   def testStateMachCall(self):
+    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'foo')
+    self.assertEquals('foo subscribed', str(self.sent.pop().body))
     self.assertEquals(0, len(self.statemach.called))
+
     self.receiveFakeMessage('test_command with args', 'foo')
+    self.assertEquals('ok', str(self.sent.pop().body))
+    self.assertEquals(1, len(self.statemach.called))
     self.assertEquals(
-        ('command_test_command', 'foo', ['with', 'args']),
+        ('command_test_command',
+          (),
+          {'args': ['with', 'args'], 'sender': 'foo'}),
         self.statemach.called.pop())
     self.assertEquals(0, len(self.statemach.called))
 
+#  def testInvalidCommand(self):
+#    self.receiveFakeMessage('hey are you there?', 'foo')
+#    self.assertEquals(0, len(self.statemach.called))
+#    self.assertEquals('so-and-so unsubscribed', str(self.sent.pop().body))
+#    self.assertTrue('so-and-so' not in self.subscribers)
+#    self.assertEquals(0, len(self.sent))
+#
+#  def testStateMachCall(self):
+#    self.assertEquals(0, len(self.statemach.called))
+#    self.receiveFakeMessage('test_command with args', 'foo')
+#    self.assertEquals(
+#        ('command_test_command', 'foo', ['with', 'args']),
+#        self.statemach.called.pop())
+#    self.assertEquals(0, len(self.statemach.called))
+
   def testInvalidCommand(self):
+    # test unsubscribed user
     self.receiveFakeMessage('hey are you there?', 'foo')
     self.assertEquals(0, len(self.statemach.called))
-    self.assertEquals('so-and-so unsubscribed', str(self.sent.pop().body))
-    self.assertTrue('so-and-so' not in self.subscribers)
+    self.assertEquals(
+        'not subscribed; send subscribe <password>', str(self.sent.pop().body))
     self.assertEquals(0, len(self.sent))
 
-  def testStateMachCall(self):
-    self.assertEquals(0, len(self.statemach.called))
-    self.receiveFakeMessage('test_command with args', 'foo')
-    self.assertEquals(
-        ('command_test_command', 'foo', ['with', 'args']),
-        self.statemach.called.pop())
-    self.assertEquals(0, len(self.statemach.called))
+    # subscribe with good password
+    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'foo')
+    self.assertEquals('foo subscribed', str(self.sent.pop().body))
 
-  def testInvalidCommand(self):
+    # test bogus text
     self.receiveFakeMessage('hey are you there?', 'foo')
     self.assertEquals(0, len(self.statemach.called))
     self.assertEquals('bad command', str(self.sent.pop().body))
     self.assertEquals(0, len(self.sent))
 
   def testSnooze(self):
-    pass # TODO
+    # subscribe with bad password
+    self.receiveFakeMessage('subscribe asdf', 'so-and-so')
+    self.assertEquals('bad password', str(self.sent.pop().body))
+    self.assertFalse('so-and-so' in self.subscribers)
+
+    # attempt to snooze: should be ignored
+    self.receiveFakeMessage('snooze 10', 'so-and-so')
+    self.assertEquals('so-and-so is not subscribed', str(self.sent.pop().body))
+    self.assertEquals(0, len(self.statemach.called))
+
+    # subscribe with good password
+    self.receiveFakeMessage('subscribe %s' % TEST_PASSWORD, 'so-and-so')
+    self.assertEquals('so-and-so subscribed', str(self.sent.pop().body))
+    self.assertTrue('so-and-so' in self.subscribers)
+
+    # snooze with bad number
+    self.receiveFakeMessage('snooze plz', 'so-and-so')
+    self.assertEquals('cannot parse "plz"', str(self.sent.pop().body))
+    self.assertEquals(0, len(self.statemach.called))
+
+    # valid snooze
+    self.receiveFakeMessage('snooze 10', 'so-and-so')
+    self.assertEquals('ok', str(self.sent.pop().body))
+    self.assertEquals(1, len(self.statemach.called))
+
