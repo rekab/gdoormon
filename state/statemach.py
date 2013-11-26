@@ -159,8 +159,6 @@ class StateMachine():
     if self.pendingTimeout:
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
-      # If we were alerting, let the user know they don't need to worry.
-      if e.src == 'alerting':
-        message = 'Door closed, timeout cancelled.'
-        self.broadcaster.sendAllSubscribers(message)
-        log.msg(message, logLevel=logging.INFO)
+    message = 'Door closed.'
+    self.broadcaster.sendAllSubscribers(message)
+    log.msg(message, logLevel=logging.INFO)
