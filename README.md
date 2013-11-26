@@ -169,6 +169,8 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
 ## TODO
 
   - test what happens if arduino is down
+    # XXX: snoozing on "alerting" takes you back to "door_open"
+  - goes from 'door_closing' to 'door_open': resets the timer
   - [x] reformat this file using github markdown
   - [ ] use unnamed virtualenv
   - [ ] get more things via xmpp:
