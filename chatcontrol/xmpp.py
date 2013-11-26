@@ -76,7 +76,11 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     else:
       log.msg('Got bogus message: %s' % msg.body)
       result = 'what?'
-    self.sendMessage(result, msg["from"]) 
+    if result:
+      log.msg('Replying: %s' % repr(result))
+      self.sendMessage(result, msg["from"]) 
+    else:
+      log.msg('No reply to send.')
 
   def dispatchCommand(self, sender, cmd_str, cmd_args):
     event_name = 'command_%s' % cmd_str.lower()

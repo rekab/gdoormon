@@ -155,7 +155,8 @@ class StateMachine():
       message = 'snoozed, will timeout in %d seconds' % duration
       self.broadcaster.sendAllSubscribers(message)
       log.msg(message, logLevel=logging.INFO)
-      return message
+      # We already broadcasted the snooze, don't return a message.
+      return ''
     else:
       return 'no timeout pending'
 

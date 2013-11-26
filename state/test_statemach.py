@@ -67,7 +67,7 @@ class StateMachineTest(unittest.TestCase):
     self.statemach.everyone_left()
     self.statemach.door_opened()
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS / 2)
-    self.statemach.snoozeAlert(100)
+    self.assertEquals('', self.statemach.snoozeAlert(100))
     self.clock.advance(99)
     self.m.VerifyAll()
 
