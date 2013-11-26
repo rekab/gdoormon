@@ -22,7 +22,7 @@ class FakeStatemach(object):
 
   def recordCall(self, attr, *args, **kw):
     self.called.append((attr, args, kw))
-    return 'ok'
+    return attr
 
 
 class TestChatProtocolBase(unittest.TestCase):
@@ -122,7 +122,7 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
     self.assertEquals(0, len(self.statemach.called))
 
     self.receiveFakeMessage('test_command with args', 'foo@example.com/asdf')
-    self.assertEquals('ok', str(self.sent.pop().body))
+    self.assertEquals('command_test_command', str(self.sent.pop().body))
     self.assertEquals(1, len(self.statemach.called))
     self.assertEquals(
         ('command_test_command',
@@ -175,6 +175,16 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
 
     # valid snooze
     self.receiveFakeMessage('snooze 10', 'foo@example.com/zxcv')
-    self.assertEquals('ok', str(self.sent.pop().body))
+    self.assertEquals('snoozeAlert', str(self.sent.pop().body))
+    self.assertEquals(1, len(self.statemach.called))
+
+  def testGetStatus(self):
+    self.receiveFakeMessage(
+        'subscribe %s' % TEST_PASSWORD, 'foo@example.com/asdf')
+    self.assertEquals('foo@example.com subscribed', str(self.sent.pop().body))
+    self.assertEquals(0, len(self.statemach.called))
+
+    self.receiveFakeMessage('status', 'foo@example.com/gmail')
+    self.assertEquals('getState', str(self.sent.pop().body))
     self.assertEquals(1, len(self.statemach.called))
 

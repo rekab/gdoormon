@@ -21,7 +21,7 @@ class SendMessageMixin:
     msg.addElement('body', content=body)
     self.send(msg)
 
-def requiresAuthentication(func):
+def requiresAuthorization(func):
   """Authorization decorator."""
   def checkAuth(self, user, cmd_args):
     if not self.isSubscriber(user):
@@ -84,7 +84,7 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       log.msg('Calling %s(%s, %s) on self' % (event_name, sender, cmd_args))
       return getattr(self, event_name)(sender, cmd_args)
 
-    # XXX: duplicated message from requiresAuthentication
+    # XXX: duplicated message from requiresAuthorization
     if not self.isSubscriber(sender):
       msg = 'not subscribed; send subscribe <password>'
       log.msg(msg)
@@ -121,14 +121,14 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     # Note: have to use .keys() because dirdbm isn't a real dict
     return user in self.subscribers.keys()
 
-  @requiresAuthentication
+  @requiresAuthorization
   def command_unsubscribe(self, sender, cmd_args):
     del self.subscribers[str(sender)]
     msg = '%s unsubscribed' % sender
     log.msg(msg)
     return msg
 
-  @requiresAuthentication
+  @requiresAuthorization
   def command_snooze(self, sender, cmd_args):
     duration = None
     if not cmd_args or not cmd_args[0]:
@@ -141,5 +141,11 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     log.msg('calling statemach.snoozeAlert(%d)' % duration)
     return self.statemach.snoozeAlert(duration)
 
+  @requiresAuthorization
+  def command_status(self, sender, cmd_args):
+    # TODO: timer stats, counts
+    return self.statemach.getState()
+
   def command_help(self, sender, cmd_args):
+    # TODO
     return "help yourself"

@@ -169,7 +169,6 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
 ## TODO
 
   - test what happens if arduino is down
-  - password protect subscribe
   - [x] reformat this file using github markdown
   - [ ] use unnamed virtualenv
   - [ ] get more things via xmpp:
@@ -185,6 +184,8 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
     - [ ] make it pretty
     - [ ] display and edit list of subscribers
     - [ ] shows all current state
+    - [ ] shows door stats
+    - [ ] shows presence historgram
   - [ ] pylint
   - [ ] broadcast who comes home and last person who left
     - [ ] register user name when registering (default to hostname or "user1", "user2", etc.)
