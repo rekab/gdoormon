@@ -124,28 +124,19 @@ class StateMachineTest(unittest.TestCase):
     self.m.VerifyAll()
 
   def testPresenceChangedDuringAlert(self):
+    # Alert will fire.
     self.expectAlertNotice()
+    # Door should close.
+    self.expectDoorClosingNotice()
+    self.mockDoorControl.hitButton()
 
     self.m.ReplayAll()
     self.statemach.door_opened()
     self.statemach.everyone_left()
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS - 10)
     self.statemach.someone_home()
-    self.clock.advance(11)  # alert should not timeout
-    self.m.VerifyAll()
-
-  def testPresenceChangedDuringAlertButDoorLeftOpen(self):
-    self.expectAlertNotice()
-    self.expectAlertNotice()
-    self.expectDoorClosing()
-
-    self.m.ReplayAll()
-    self.statemach.door_opened()
-    self.statemach.everyone_left()
-    self.clock.advance(statemach.ALERT_TIMEOUT_SECS - 10)
-    self.statemach.someone_home()
-    self.clock.advance(statemach.DOOR_OPEN_TIMEOUT_SECS)
-    self.clock.advance(statemach.ALERT_TIMEOUT_SECS)
+    # Alert should still continue and timeout.
+    self.clock.advance(11)
     self.m.VerifyAll()
 
   def testDoorClosedWhileSomeoneHome(self):

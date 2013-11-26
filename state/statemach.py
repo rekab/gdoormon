@@ -41,7 +41,6 @@ class StateMachine():
     self.pendingTimeout = None
     self._callLater = callLater
     self._system = system
-    # XXX: snoozing on "alerting" takes you back to "door_open"
     self.state = fysom.Fysom({
         'initial': 'ok',
         'events': [
@@ -49,9 +48,12 @@ class StateMachine():
           dict(name='everyone_left', src=['door_open', 'alerting'], dst='alerting'),
           dict(name='everyone_left', src=['door_closing'], dst='door_closing'),
 
-          dict(name='someone_home', src=['ok', 'nobody_home', 'door_closing'], dst='ok'),
-          dict(name='someone_home', src='alerting', dst='door_open'),
+          # Note: someone_home event happens during every airport poll, so it's
+          # important not to leave many states.
+          dict(name='someone_home', src=['ok', 'nobody_home'], dst='ok'),
+          dict(name='someone_home', src=['alerting'], dst='alerting'),
           dict(name='someone_home', src=['door_open'], dst='door_open'),
+          dict(name='someone_home', src=['door_closing'], dst='door_closing'),
 
           dict(name='door_opened', src=['ok', 'door_open'], dst='door_open'),
           dict(name='door_opened', src=['nobody_home', 'alerting'], dst='alerting'),
@@ -59,6 +61,7 @@ class StateMachine():
 
           dict(name='timeout', src=['door_open', 'nobody_home'], dst='alerting'),
           dict(name='timeout', src=['alerting'], dst='door_closing'),
+          # TODO:
           #dict(name='timeout', src='door_closing', dst='door_stuck'),
 
           # Currently only one command: close the door

@@ -38,7 +38,7 @@ config = ConfigParser.ConfigParser()
 config.read([config_path])
 
 
-# Setup the application.
+# Setup the application. Twisted looks for a variable named 'application'.
 application = service.Application(APP_NAME)
 sc = service.MultiService()
 sc.setServiceParent(application)
