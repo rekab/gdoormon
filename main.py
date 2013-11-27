@@ -60,7 +60,7 @@ xmpp_user = config.get(APP_NAME, 'xmpp_user')
 xmpp_passwd = config.get(APP_NAME, 'xmpp_passwd')
 xmppclient = client.XMPPClient(
     jid.internJID('%s/%s' % (xmpp_user, APP_NAME)), xmpp_passwd)
-xmppclient.logTraffic = True
+xmppclient.logTraffic = False
 xmppclient.setServiceParent(sc)
 
 subscribers = dirdbm.DirDBM(subscriber_dir)
