@@ -174,7 +174,9 @@ class StateMachine():
       self.pendingTimeout = None
 
     message = 'Door closed.'
-    if e.src == 'alerting':
-      # Only notify that the door is closed after sending an alert.
+    # Notify that the door is closed if we came from:
+    # - door_closing, because that means closeDoor() got called.
+    # - alerting, to notify that the alert is no longer relevant.
+    if e.src == 'door_closing' or e.src == 'alerting':
       self.broadcaster.sendAllSubscribers(message)
     log.msg(message, logLevel=logging.INFO)

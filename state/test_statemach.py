@@ -41,7 +41,7 @@ class StateMachineTest(unittest.TestCase):
   def expectSnoozeNotice(self):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'snoozed, will timeout'))
 
-  def expectDoorClosedDuringAlertNotice(self):
+  def expectDoorClosedNotice(self):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Door closed.'))
 
   def expectDoorClosing(self):
@@ -92,25 +92,29 @@ class StateMachineTest(unittest.TestCase):
 
   def testNobodyHomeDoorOpenAlert(self):
     self.expectAlertAndDoorClosure()
+    self.expectDoorClosedNotice()
 
     self.m.ReplayAll()
     self.statemach.everyone_left()
     self.statemach.door_opened()
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS)
+    self.statemach.door_closed()
     self.m.VerifyAll()
 
   def testSomeoneHomeDoorOpenTimeoutAlert(self):
     self.expectAlertAndDoorClosure()
+    self.expectDoorClosedNotice()
 
     self.m.ReplayAll()
     self.statemach.door_opened()
     self.clock.advance(statemach.DOOR_OPEN_TIMEOUT_SECS)
     self.clock.advance(statemach.ALERT_TIMEOUT_SECS)
+    self.statemach.door_closed()
     self.m.VerifyAll()
 
   def testDoorClosedDuringAlert(self):
     self.expectAlertNotice()
-    self.expectDoorClosedDuringAlertNotice()
+    self.expectDoorClosedNotice()
 
     self.m.ReplayAll()
     self.statemach.everyone_left()
@@ -121,11 +125,7 @@ class StateMachineTest(unittest.TestCase):
     self.m.VerifyAll()
 
   def testPresenceChangedDuringAlert(self):
-    # Alert will fire.
-    self.expectAlertNotice()
-    # Door should close.
-    self.expectDoorClosingNotice()
-    self.mockDoorControl.hitButton()
+    self.expectAlertAndDoorClosure()
 
     self.m.ReplayAll()
     self.statemach.door_opened()
