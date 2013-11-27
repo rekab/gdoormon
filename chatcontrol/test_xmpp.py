@@ -2,6 +2,7 @@
 
 from twisted.trial import unittest
 from twisted.words.xish import domish
+import re
 import xmpp
 
 
@@ -66,7 +67,7 @@ class ChatCommandReceiverProtocol(TestChatProtocolBase):
   def testHelp(self):
     self.receiveFakeMessage('help me!', 'foo@example.com/zzzz')
     self.assertEquals(1, len(self.sent))
-    self.assertEquals('help yourself', str(self.sent[0].body))
+    self.assertTrue(re.match('commands: help, .*', str(self.sent[0].body)))
     # Verify the statemach wasn't touched
     self.assertEquals(0, len(self.statemach.called))
 

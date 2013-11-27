@@ -9,8 +9,8 @@ from wokkel import xmppim
 from wokkel import subprotocols
 
 
-# How long alert snooze lasts (in seconds).
-DEFAULT_SNOOZE_DURATION = 20
+# How long alert snooze lasts (in minutes).
+DEFAULT_SNOOZE_DURATION = 5
 
 
 class SendMessageMixin:
@@ -137,11 +137,12 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     duration = None
     if not cmd_args or not cmd_args[0]:
       duration = DEFAULT_SNOOZE_DURATION
-
-    try:
-      duration = int(cmd_args[0])
-    except ValueError, e:
-      return 'cannot parse "%s"' % cmd_args[0]
+    else:
+      try:
+        duration = int(cmd_args[0])
+      except ValueError, e:
+        return 'cannot parse "%s"' % cmd_args[0]
+    duration *= 60.0  # convert to minutes
     log.msg('calling statemach.snoozeAlert(%d)' % duration)
     return self.statemach.snoozeAlert(duration)
 
@@ -151,5 +152,4 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
     return self.statemach.getState()
 
   def command_help(self, sender, cmd_args):
-    # TODO
-    return "help yourself"
+    return "commands: help, status, snooze, snooze <minutes>, close_door"

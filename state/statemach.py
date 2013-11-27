@@ -149,6 +149,13 @@ class StateMachine():
     # TODO: setup a timeout until door_stuck
 
   def snoozeAlert(self, duration):
+    """Reset the timer.
+
+    Args:
+      duration: seconds to snooze.
+    Returns:
+      string to reply to the user
+    """
     if self.pendingTimeout:
       # TODO: if snoozed, give a 2-minute warning that the snooze will expire
       self.pendingTimeout.reset(duration)
