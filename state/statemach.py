@@ -138,7 +138,7 @@ class StateMachine():
     self.state.timeout()
 
   def closeDoor(self, e):
-    message = 'closing the door'
+    message = 'Closing the door.'
     if self.pendingTimeout:
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
@@ -171,6 +171,9 @@ class StateMachine():
     if self.pendingTimeout:
       self.pendingTimeout.cancel()
       self.pendingTimeout = None
+
     message = 'Door closed.'
-    self.broadcaster.sendAllSubscribers(message)
+    if e.src == 'alerting':
+      # Only notify that the door is closed after sending an alert.
+      self.broadcaster.sendAllSubscribers(message)
     log.msg(message, logLevel=logging.INFO)

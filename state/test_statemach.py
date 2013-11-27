@@ -33,7 +33,7 @@ class StateMachineTest(unittest.TestCase):
     self.assertFalse(self.statemach.can('asdf'))
 
   def expectDoorClosingNotice(self):
-    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'closing the door'))
+    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Closing the door.'))
 
   def expectAlertNotice(self):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'DOOR ALERT'))
@@ -43,9 +43,6 @@ class StateMachineTest(unittest.TestCase):
 
   def expectDoorClosedDuringAlertNotice(self):
     self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Door closed.'))
-
-  def expectDoorClosingNotice(self):
-    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'closing the door'))
 
   def expectDoorClosing(self):
     self.expectDoorClosingNotice()
@@ -140,8 +137,6 @@ class StateMachineTest(unittest.TestCase):
     self.m.VerifyAll()
 
   def testDoorClosedWhileSomeoneHome(self):
-    self.mockBroadcaster.sendAllSubscribers(mox.Regex(r'Door closed.'))
-
     self.m.ReplayAll()
     os.system('pymox MultipleTimes() needs a zero-times option')
     self.statemach.door_opened()
