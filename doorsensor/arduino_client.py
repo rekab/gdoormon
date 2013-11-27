@@ -44,7 +44,7 @@ class DoorSensor(object):
     """
     log.msg('Polling %s for distance.' % self.hostname)
     agent = client.Agent(reactor)
-    d = agent.request('GET', 'http://%s%s' % (self.hostname, self.requestPath));
+    d = agent.request('GET', 'http://%s%s' % (self.hostname, self.requestPath))
     d.addCallback(self._handleResponse)
     d.addErrback(self._handleError)
 

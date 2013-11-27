@@ -1,12 +1,9 @@
 import re
 
-from twisted.internet import protocol
-from twisted.internet import protocol
 from twisted.python import log
 
 from twisted.words.xish import domish
 from wokkel import xmppim
-from wokkel import subprotocols
 
 
 # How long alert snooze lasts (in minutes).
@@ -139,8 +136,9 @@ class ChatCommandReceiverProtocol(SendMessageMixin, xmppim.MessageProtocol):
       duration = DEFAULT_SNOOZE_DURATION
     else:
       try:
-        duration = int(cmd_args[0])
-      except ValueError, e:
+        # Note that we use float(), which is handy for testing <1m intervals.
+        duration = float(cmd_args[0])
+      except ValueError:
         return 'cannot parse "%s"' % cmd_args[0]
     duration *= 60.0  # convert to minutes
     log.msg('calling statemach.snoozeAlert(%d)' % duration)

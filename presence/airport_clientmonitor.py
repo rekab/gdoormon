@@ -10,7 +10,6 @@ pressence_service = internet.TimerService(15, monitor.check)
 import airport_snmp
 import argparse
 import os
-import sys
 import time
 from presence import clientdb
 from twisted.python import log
@@ -50,19 +49,6 @@ class PresenceMonitor(object):
 
   def setPresenceDetected(self, b):
     self._toggleCallback(b)
-    ## XXX:
-    ## door open -> nobody home -> door closing -> ok -> door_open
-    #log.msg('someone_home=%s' % b)
-    #if self._someone_home is None:
-    #  log.msg('initializing someone_home=%s' % b)
-    #  self._someone_home = b
-    #else:
-    #  if self._someone_home != b:
-    #    log.msg('toggling someone_home=%s' % b)
-    #    self._someone_home = b
-    #    self._toggleCallback(b)
-    #  else:
-    #    log.msg('leaving self._someone_home=%s' % self._someone_home)
 
 
 class StatemachToggle(object):
@@ -103,6 +89,7 @@ def setupFlags(parser=None):
 
 def setupLogging():
   # Setup presence logging
+  import logging
   fh = logging.FileHandler('presence.log')
   fh.setLevel(logging.INFO)
   formatter = logging.Formatter('%(asctime)s:%(name)s:%(levelname)s] Presence: %(message)s')
@@ -120,7 +107,7 @@ def main():
   presence_mon = PresenceMonitor(flags.airport, db, toggle)
 
   while True:
-    presence_mon.Check()
+    presence_mon.check()
     log.msg('sleeping %d seconds' % flags.sleep)
     time.sleep(flags.sleep)
 

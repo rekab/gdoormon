@@ -126,7 +126,8 @@ class StateMachine():
       assert e.src == 'door_open'
       self.pendingTimeout.cancel()
 
-    message = 'DOOR ALERT! Timeout in %s seconds (reply "snooze" to snooze)' % self.alertTimeoutSecs
+    message = 'DOOR ALERT! Timeout in %s seconds (reply "snooze" to snooze)' % (
+        self.alertTimeoutSecs)
     self.logAndSpeakMessage(message)
     self.broadcaster.sendAllSubscribers(message)
     self.pendingTimeout = self._callLater(self.alertTimeoutSecs,

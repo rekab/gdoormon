@@ -18,7 +18,6 @@ from twisted.python import log
 from twisted.python import logfile
 from twisted.web import server
 from twisted.words.protocols.jabber import jid
-from twisted.words.xish import domish
 from wokkel import client
 import ConfigParser
 

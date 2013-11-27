@@ -2,7 +2,6 @@
 
 Requires a Pololu Micro Maestro set in "USB Dual Port" mode.
 """
-import logging
 import serial
 from twisted.internet import reactor
 from twisted.python import log

@@ -168,10 +168,7 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
 
 ## TODO
 
-  - test what happens if arduino is down
-  - snooze should take minutes
   - [x] reformat this file using github markdown
-  - [ ] use unnamed virtualenv
   - [ ] get more things via xmpp:
     - [ ] current state
     - [ ] help
@@ -188,6 +185,7 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
     - [ ] shows door stats
     - [ ] shows presence historgram
   - [ ] pylint
+  - [ ] use unnamed virtualenv
   - [ ] broadcast who comes home and last person who left
     - [ ] register user name when registering (default to hostname or "user1", "user2", etc.)
   - [ ] support rpi gpio
