@@ -23,7 +23,6 @@ class PresenceMonitor(object):
     self._db = db
     self._someone_home = None
     self._toggleCallback = toggleCallback
-    #self._log = logging.getLogger('presence')
 
   def check(self):
     log.msg('Polling for airport clients.')

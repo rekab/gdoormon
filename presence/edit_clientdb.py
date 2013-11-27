@@ -1,4 +1,8 @@
 #!/usr/bin/python
+#
+# Simple admin script to edit the clientdb.
+#
+
 import argparse
 import clientmonitor
 import logging

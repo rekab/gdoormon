@@ -3,9 +3,7 @@
 import os
 import mox
 import statemach
-# TODO TODO: straighten out import paths!
 from doorcontrol import maestro
-#from chatcontrol import xmpp
 from twisted.internet import task
 from twisted.trial import unittest
 
@@ -22,7 +20,8 @@ class StateMachineTest(unittest.TestCase):
 
     self.mockBroadcaster = self.m.CreateMockAnything()
     self.mockDoorControl = self.m.CreateMock(maestro.DoorControl)
-    self.statemach = statemach.StateMachine(self.mockBroadcaster, self.mockDoorControl,
+    self.statemach = statemach.StateMachine(
+        self.mockBroadcaster, self.mockDoorControl,
         callLater=self.clock.callLater, system=os.system)
 
   def testStartState(self):
@@ -143,4 +142,4 @@ class StateMachineTest(unittest.TestCase):
     self.statemach.door_closed()
     self.m.VerifyAll()
 
-  # todo someone_home repeatedly?
+  # TODO: test someone_home repeatedly?

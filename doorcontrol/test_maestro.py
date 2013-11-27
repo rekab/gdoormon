@@ -13,11 +13,6 @@ class DoorControlTest(unittest.TestCase):
     self.clock = task.Clock()
     self.control = maestro.DoorControl(
         self.mock_micro_maestro, callLater=self.clock.callLater)
-#    self.patch(time, 'sleep', self.mockSleep)
-#    self.sleeps = []
-#
-#  def mockSleep(self, duration):
-#    self.sleeps.append(duration)
 
   def testHitButton(self):
     self.mock_micro_maestro.setAngle(maestro.IMPINGE_ANGLE)
