@@ -8,7 +8,7 @@ from twisted.python import log
 
 PRESS_DURATION = .5
 IMPINGE_ANGLE = 0
-RETRACT_ANGLE = 60
+RETRACT_ANGLE = 90
 
 
 class PololuMicroMaestro(object):
