@@ -6,8 +6,9 @@ import serial
 from twisted.internet import reactor
 from twisted.python import log
 
-IMPINGE_ANGLE = 10
-RETRACT_ANGLE = 170
+PRESS_DURATION = .5
+IMPINGE_ANGLE = 0
+RETRACT_ANGLE = 90
 
 
 class PololuMicroMaestro(object):
@@ -48,18 +49,21 @@ class PololuMicroMaestro(object):
 
 
 class DoorControl(object):
-  def __init__(self, p, pressDuration=.5, callLater=reactor.callLater):
+  def __init__(self, p, pressDuration=PRESS_DURATION, callLater=reactor.callLater,
+      impingeAngle=IMPINGE_ANGLE, retractAngle=RETRACT_ANGLE):
     self._p = p
     self._pressDuration = pressDuration
     self._callLater = callLater
+    self._impingeAngle = impingeAngle
+    self._retractAngle = retractAngle
 
   def _impinge(self):
     log.msg('impinge ->')
-    self._p.setAngle(IMPINGE_ANGLE)
+    self._p.setAngle(self._impingeAngle)
 
   def _retract(self):
     log.msg('<- retract')
-    self._p.setAngle(RETRACT_ANGLE)
+    self._p.setAngle(self._retractAngle)
     self._callLater(self._pressDuration, self._idle)
   
   def _idle(self):
