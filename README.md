@@ -1,9 +1,14 @@
 # gdoormon
 
 Shuts the garage door if it's left open for too long, configurable based on
-whether or not someone is home. Send alerts and controlled via XMPP.
+whether or not someone is home. 
 
-Determines who's home by polling an Airport for wireless clients. Wireless
+There are literaly dozens of commercial an open source things that do this
+exact thing, this one is somewhat unique (AFAIK) because it:
+  - Determines if anyone is home by checking for registered wifi clients.
+  - Sends alerts and can be controlled via XMPP.
+
+Determines who's home by polling an Airport for its wireless clients. Wireless
 clients need to register their MAC address via the webserver started on port
 8080.
 
