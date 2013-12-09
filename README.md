@@ -3,8 +3,8 @@
 Shuts the garage door if it's left open for too long, configurable based on
 whether or not someone is home. 
 
-There are literaly dozens of commercial an open source things that do this
-exact thing, this one is somewhat unique (AFAIK) because it:
+There are already many commercial and open source things that do this exact
+thing, this one is somewhat unique (AFAIK) because it:
   - Determines if anyone is home by checking for registered wifi clients.
   - Sends alerts and can be controlled via XMPP.
 
@@ -25,7 +25,7 @@ Tested on Raspian 7 (wheezy) and Ubuntu 12.04 (precise).
 
 ## Demo
 
-!VIDEO "http://www.youtube.com/embed/V6vPZZMur6Q"
+http://youtu.be/V6vPZZMur6Q
 
 ## Disclaimer
 
