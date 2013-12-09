@@ -27,6 +27,12 @@ Tested on Raspian 7 (wheezy) and Ubuntu 12.04 (precise).
 
 !VIDEO "http://www.youtube.com/embed/V6vPZZMur6Q"
 
+## Disclaimer
+
+All sorts of things could go wrong and compromise the security and safety of
+your garage door. This code is licensed under the GPLv2, so note parts 11 and
+12 in all caps that go on about "NO WARRANTY" and all that.
+
 ## Hardware Deps
 
 You'll need:
@@ -178,9 +184,10 @@ If your distro uses systemd, copy ```gdoormon.service``` to /etc/systemd/system
 ## TODO
 
   - [x] reformat this file using github markdown
-  - [ ] get more things via xmpp:
-    - [ ] current state
-    - [ ] help
+  - [x] get more things via xmpp:
+    - [x] current state
+    - [x] help
+    - [ ] stats
   - [ ] after an alert, warn that the timeout is approaching
   - [ ] add chat subscriptions to:
     - [ ] when registered clients connect/disconnect
