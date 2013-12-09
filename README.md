@@ -1,7 +1,7 @@
 # gdoormon
 
-Shuts the garage door if it's left open for too long, or when it's open and
-nobody is home. 
+Shuts the garage door if it's left open for too long, configurable based on
+whether or not someone is home. Send alerts and controlled via XMPP.
 
 Determines who's home by polling an Airport for wireless clients. Wireless
 clients need to register their MAC address via the webserver started on port
@@ -17,6 +17,10 @@ Shuts the door using an Pololu Micro Maestro server controller to drive a
 servo to hit a button (e.g. garage door remote button).
 
 Tested on Raspian 7 (wheezy) and Ubuntu 12.04 (precise).
+
+## Demo
+
+!VIDEO "http://www.youtube.com/embed/V6vPZZMur6Q"
 
 ## Hardware Deps
 
